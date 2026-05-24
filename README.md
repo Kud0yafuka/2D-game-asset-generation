@@ -1,73 +1,74 @@
+
+
+```markdown
 # SpriteCraft Studio
 
-SpriteCraft Studio is a 2D game asset generation workbench for independent game developers, Game Jam teams, and small 2D studios. The product goal is to turn short text prompts and simple parameters into game-ready assets that can later be previewed, refined, and exported into common engine workflows.
-
-This repository is being built for the XEngineer competition topic: 2D game asset generation.
+SpriteCraft Studio 是一个面向独立游戏开发者、Game Jam 团队和小型 2D 工作室的 2D 游戏资产生成工作台。产品目标是将简短的文字提示和简单参数转化为可直接用于游戏的资产，并支持后续预览、精修和导出到常见引擎的工作流。
 
 ## Current Milestone
 
-The six pull requests establish a complete competition-ready workflow:
+六个 Pull Request 构建起一套完整的竞赛就绪工作流：
 
-- PR 1: React + Vite + TypeScript scaffold, CI, documentation, and competition framing.
-- PR 2: SpriteCraft Studio editor layout, design system, static demo asset library, preview modes, parameter panel, queue shell, and inspector shell.
-- PR 3: Mock generation workflow with local asset creation, queue state, prompt validation, history updates, and Style Lock behavior.
-- PR 4: Real OpenAI image generation through a local API proxy with mock fallback for demo safety.
-- PR 5: Editing and export pipeline with PNG, sprite sheet, metadata JSON, and engine-ready ZIP output.
-- PR 6: Demo polish, submission readiness panel, architecture notes, and final presentation materials.
+- PR 1：React + Vite + TypeScript 脚手架、CI、文档与竞赛框架搭建。
+- PR 2：SpriteCraft Studio 编辑器布局、设计系统、静态演示资产库、预览模式、参数面板、队列外壳和检查器外壳。
+- PR 3：模拟生成工作流，包含本地资产创建、队列状态、提示词验证、历史更新以及风格锁定行为。
+- PR 4：通过本地 API 代理接入真实的 OpenAI 图像生成，并保留模拟回退以保证演示安全。
+- PR 5：编辑与导出管线，支持 PNG、精灵表、元数据 JSON 以及引擎就绪的 ZIP 输出。
+- PR 6：演示打磨、提交就绪面板、架构说明。
 
-The PR sequence is intentionally staged so the repository shows a credible 72-hour solo development process.
+## 产品方向
 
-## Product Direction
+SpriteCraft Studio 是一个真正的编辑器界面，而非营销页面。
+首屏即呈现完整工作流：
 
-SpriteCraft Studio is designed as a real editor surface rather than a marketing page. The first screen contains the workflow:
+- Asset families：角色、怪物、道具、图块、UI、特效和历史。
+- 预览模式：单张图片、精灵表、Alpha 棋盘格和动画播放。
+- 提示词控制：风格、尺寸、帧数、调色板、种子、透明度和风格锁定。
+- 检查器：选中资产的元数据、引擎目标以及计划中的导出操作。
+- Export pipeline：预览 PNG、精灵表 PNG、元数据 JSON 以及 Unity/Godot/Web ZIP 结构。
+- 提交就绪：用于评判产品完成度、开发质量和演示呈现的最终检查清单。
 
-- Asset families: character, monster, prop, tile, UI, effect, and history.
-- Preview modes: single image, sprite sheet, alpha checkerboard, and animation playback.
-- Prompt controls: style, size, frame count, palette, seed, transparency, and style lock.
-- Inspector: selected asset metadata, engine target, and planned export actions.
-- Export pipeline: preview PNG, sprite sheet PNG, metadata JSON, and Unity/Godot/Web ZIP structure.
-- Submission readiness: final judging map for product completeness, development quality, and demo presentation.
-
-## Tech Stack
+## 技术栈
 
 - React 19
 - TypeScript
 - Vite
 - ESLint
-- lucide-react icons
+- lucide-react 图标库
 
-## Local Development
+## 本地开发
 
 ```bash
 npm install
 npm run dev
 ```
 
-For OpenAI-backed generation, create `.env.local` from `.env.example` and set `OPENAI_API_KEY`. The browser never receives this key; requests go through the local API proxy.
+如需使用 OpenAI 图像生成，请根据 `.env.example` 创建 `.env.local` 并设置 `OPENAI_API_KEY`。浏览器永远不会接触该密钥；所有请求均通过本地 API 代理转发。
 
-Run quality checks:
+运行质量检查：
 
 ```bash
 npm run lint
 npm run build
 ```
 
-## Competition Notes
+## 竞赛说明
 
-The implementation is planned around six focused pull requests:
+整个实现围绕六个聚焦的 PR 展开：
 
-1. Project bootstrap and competition setup.
-2. Product shell and design system.
-3. Mock asset workflow.
-4. Real AI generation integration.
-5. Editing and export pipeline.
-6. Demo polish and submission docs.
+1. 项目初始化和竞赛环境搭建。
+2. 产品外壳与设计系统。
+3. 模拟资产工作流。
+4. 真实 AI 生成集成。
+5. 编辑与导出管线。
+6. 演示打磨与提交文档。
 
-Each PR keeps the main branch runnable and includes focused commits, making the development process easy to review.
+每个 PR 都保持主分支可运行，并包含专注的提交，使开发过程易于审查。
 
-Useful submission docs:
+有用的提交文档：
 
-- [Product design](docs/product-design.md)
-- [Architecture notes](docs/architecture.md)
-- [Demo script](docs/demo-script.md)
-- [Submission notes](docs/submission-notes.md)
+- [产品设计](docs/product-design.md)
+- [架构说明](docs/architecture.md)
+- [演示脚本](docs/demo-script.md)
+- [提交备注](docs/submission-notes.md)
+```
