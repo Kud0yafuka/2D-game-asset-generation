@@ -46,7 +46,7 @@ export function PreviewStage({ asset, mode, onModeChange }: PreviewStageProps) {
           <span>{asset ? `${asset.size} / ${asset.frameCount} frames / ${asset.source}` : 'Select an asset'}</span>
         </div>
         <div className="segmented-control">
-          {modes.map((item) => {
+          {asset && modes.map((item) => {
             const Icon = item.icon
             return (
               <button
@@ -64,7 +64,7 @@ export function PreviewStage({ asset, mode, onModeChange }: PreviewStageProps) {
       </div>
 
       <div className={`stage ${mode === 'checker' ? 'checker-bg' : ''}`}>
-        {!asset && <div className="stage-placeholder">Select or generate an asset</div>}
+        {!asset && <div className="stage-placeholder">生成第一个 Doubao Seedream 素材后可在这里预览</div>}
         {asset && mode !== 'sheet' && (
           <img className={`stage-image ${mode === 'animation' ? 'is-playing' : ''}`} src={frame} alt={asset.name} />
         )}

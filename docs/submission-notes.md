@@ -6,8 +6,8 @@ SpriteCraft Studio covers the full first-pass asset workflow:
 
 - Prompt and simple parameter input.
 - Asset family presets for characters, monsters, props, tiles, UI, and effects.
-- Local mock generation for reliable demos.
-- OpenAI generation path through a secure local proxy.
+- Doubao Seedream generation path through a secure local proxy.
+- Explicit API failure reporting instead of mock replacement.
 - Style Lock for consistent follow-up assets.
 - Preview modes for single image, alpha checkerboard, sprite sheet, and frame playback.
 - Inspector metadata and engine target selection.
@@ -32,9 +32,9 @@ Code is organized by domain boundaries: catalog data, generation services, expor
 
 Recommended demo path:
 
-1. Start in Mock mode and generate a character safely.
+1. Generate a character through Doubao Seedream.
 2. Switch preview modes to show asset usability.
 3. Enable Style Lock and generate a matching monster or prop.
-4. Show OpenAI mode and explain the secure proxy plus fallback.
+4. Show the secure proxy and the server logs that include the structured prompt.
 5. Export JSON and sprite sheet from the inspector.
-6. Close with the Submission Ready panel and the six-PR iteration story.
+6. Close with the staged PR iteration story.

@@ -7,14 +7,11 @@ import { QueuePanel } from './components/QueuePanel'
 import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { assetCategories, getCategory } from './data/catalog'
-import { initialAssets } from './data/initialAssets'
 import { generateOpenAiAssets } from './services/apiGeneration'
-import { generateMockAssets } from './services/mockGeneration'
 import type {
   AssetCategoryId,
   EngineTarget,
   GameAsset,
-  GenerationMode,
   GenerationParams,
   GenerationTask,
   PreviewMode,
@@ -33,25 +30,13 @@ const initialParams: GenerationParams = {
   styleLock: false,
 }
 
-const bootTasks: GenerationTask[] = [
-  {
-    id: 'boot-1',
-    label: 'Demo kit seeded',
-    status: 'done',
-    startedAt: new Date().toISOString(),
-    completedAt: new Date().toISOString(),
-    message: '4 sample assets ready',
-  },
-]
-
 function App() {
   const [activeCategory, setActiveCategory] = useState<AssetCategoryId>('character')
   const [params, setParams] = useState<GenerationParams>(initialParams)
-  const [assets, setAssets] = useState<GameAsset[]>(initialAssets)
-  const [selectedId, setSelectedId] = useState(initialAssets[0]?.id)
+  const [assets, setAssets] = useState<GameAsset[]>([])
+  const [selectedId, setSelectedId] = useState<string | undefined>()
   const [previewMode, setPreviewMode] = useState<PreviewMode>('single')
-  const [generationMode, setGenerationMode] = useState<GenerationMode>('mock')
-  const [tasks, setTasks] = useState<GenerationTask[]>(bootTasks)
+  const [tasks, setTasks] = useState<GenerationTask[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [engineTarget, setEngineTarget] = useState<EngineTarget>('godot')
 
@@ -117,14 +102,7 @@ function App() {
       status: prompt.length < 4 ? 'failed' : 'running',
       startedAt: new Date().toISOString(),
       completedAt: prompt.length < 4 ? new Date().toISOString() : undefined,
-      message:
-        prompt.length < 4
-          ? 'Prompt needs more detail'
-          : generationMode === 'openai'
-            ? 'Contacting OpenAI image model'
-          : params.styleLock && selectedAsset
-            ? `Using style lock from ${selectedAsset.name}`
-            : 'Generating local candidates',
+      message: prompt.length < 4 ? '素材描述需要更具体' : '正在调用 Doubao Seedream 生成真实素材',
     }
 
     setTasks((current) => [task, ...current])
@@ -133,28 +111,41 @@ function App() {
     }
 
     setIsGenerating(true)
-    const result =
-      generationMode === 'openai'
-        ? await generateOpenAiAssets(params, selectedAsset)
-        : await generateMockAssets(params, selectedAsset, generationMode)
-    const generatedAssets = result.assets
+    try {
+      const result = await generateOpenAiAssets(params, selectedAsset)
+      const generatedAssets = result.assets
 
-    setAssets((current) => [...generatedAssets, ...current])
-    setSelectedId(generatedAssets[0]?.id)
-    setActiveCategory(params.categoryId)
-    setTasks((current) =>
-      current.map((item) =>
-        item.id === taskId
-          ? {
-              ...item,
-              status: result.fallback && generationMode === 'openai' ? 'failed' : 'done',
-              completedAt: new Date().toISOString(),
-              message: `${generatedAssets.length} assets ready / ${result.message}`,
-            }
-          : item,
-      ),
-    )
-    setIsGenerating(false)
+      setAssets((current) => [...generatedAssets, ...current])
+      setSelectedId(generatedAssets[0]?.id)
+      setActiveCategory(params.categoryId)
+      setTasks((current) =>
+        current.map((item) =>
+          item.id === taskId
+            ? {
+                ...item,
+                status: 'done',
+                completedAt: new Date().toISOString(),
+                message: `${generatedAssets.length} 个 Doubao Seedream 素材已生成`,
+              }
+            : item,
+        ),
+      )
+    } catch (error) {
+      setTasks((current) =>
+        current.map((item) =>
+          item.id === taskId
+            ? {
+                ...item,
+                status: 'failed',
+                completedAt: new Date().toISOString(),
+                message: error instanceof Error ? error.message : 'Doubao Seedream 生成失败',
+              }
+            : item,
+        ),
+      )
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   function retryLast() {
@@ -203,10 +194,8 @@ function App() {
         <aside className="right-rail">
           <ControlsPanel
             params={params}
-            mode={generationMode}
             isGenerating={isGenerating}
             onParamsChange={updateParams}
-            onModeChange={setGenerationMode}
             onGenerate={() => void runGeneration()}
           />
           <InspectorPanel

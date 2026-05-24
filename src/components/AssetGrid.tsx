@@ -14,7 +14,8 @@ export function AssetGrid({ assets, selectedId, onSelect, onToggleFavorite }: As
     return (
       <div className="empty-state">
         <ImageIcon size={28} />
-        <strong>No assets in this lane</strong>
+        <strong>还没有真实生成的素材</strong>
+        <span>填写右侧参数并点击生成素材后，Doubao Seedream 结果会出现在这里。</span>
       </div>
     )
   }

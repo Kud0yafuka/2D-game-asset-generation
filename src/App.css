@@ -66,7 +66,6 @@
 .icon-button,
 .text-button,
 .primary-action,
-.mode-switch button,
 .segmented-control button,
 .asset-family-pills button,
 .export-grid button {
@@ -200,8 +199,7 @@
 }
 
 .segmented-control,
-.asset-family-pills,
-.mode-switch {
+.asset-family-pills {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -211,8 +209,7 @@
 }
 
 .segmented-control button,
-.asset-family-pills button,
-.mode-switch button {
+.asset-family-pills button {
   min-height: 30px;
   border-radius: 7px;
   padding: 0 9px;
@@ -230,8 +227,7 @@
 }
 
 .segmented-control button.is-active,
-.asset-family-pills button.is-active,
-.mode-switch button.is-active {
+.asset-family-pills button.is-active {
   color: #123f3a;
   background: #fff;
   box-shadow: 0 1px 6px rgba(27, 48, 42, 0.09);
@@ -446,7 +442,6 @@
 
 .field,
 .toggle-grid,
-.mode-switch,
 .palette-strip,
 .export-grid,
 .details-list,
@@ -534,11 +529,6 @@
   background: #fbfcfa;
   font-size: 13px;
   font-weight: 720;
-}
-
-.mode-switch {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
 }
 
 .primary-action {

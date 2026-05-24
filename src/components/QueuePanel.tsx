@@ -24,6 +24,12 @@ export function QueuePanel({ tasks, onRetry }: QueuePanelProps) {
         </button>
       </div>
       <div className="queue-list">
+        {tasks.length === 0 && (
+          <div className="empty-state compact">
+            <strong>暂无生成任务</strong>
+            <span>失败会显示真实错误，不再自动替换成本地样例。</span>
+          </div>
+        )}
         {tasks.slice(0, 6).map((task) => {
           const Icon = statusIcon[task.status]
           return (

@@ -78,7 +78,8 @@ export const stylePresets: StylePreset[] = [
   {
     id: 'pixel',
     label: '像素风',
-    prompt: 'pixel art, crisp square pixels, limited palette, no antialiasing',
+    prompt:
+      'strict pixel art sprite, visible square pixel blocks, low-resolution game sprite feeling, hard stepped edges, limited palette, no antialiasing, no smooth vector gradients',
   },
   {
     id: 'handpainted',
@@ -88,7 +89,8 @@ export const stylePresets: StylePreset[] = [
   {
     id: 'cartoon',
     label: '卡通',
-    prompt: 'stylized cartoon game art, bold contour, friendly shape language',
+    prompt:
+      'stylized cartoon game art, rounded readable silhouette, smooth clean contour, soft cel shading, friendly shape language, not pixel art, no square pixel blocks',
   },
   {
     id: 'ink',
