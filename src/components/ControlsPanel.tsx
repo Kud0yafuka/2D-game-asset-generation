@@ -31,14 +31,17 @@ export function ControlsPanel({
     <section className="controls-panel" aria-label="Generation controls">
       <div className="panel-heading">
         <div>
-          <h2>Generate</h2>
+          <h2>生成素材</h2>
           <span>{category.description}</span>
         </div>
       </div>
 
       <label className="field">
-        <span>Prompt</span>
+        <span>素材描述</span>
         <textarea
+          aria-label="素材描述"
+          placeholder="例如：穿蓝色披风的像素风骑士，正面站立，idle 动画，轮廓清晰"
+          title="描述你想生成的游戏素材外观、动作、用途和需要避免的问题"
           value={params.prompt}
           onChange={(event) => onParamsChange({ ...params, prompt: event.target.value })}
           rows={5}
@@ -47,8 +50,10 @@ export function ControlsPanel({
 
       <div className="field-grid">
         <label className="field">
-          <span>Family</span>
+          <span>素材类型</span>
           <select
+            aria-label="素材类型"
+            title="选择角色、怪物、道具、地块、UI 或特效；切换后会自动更新推荐尺寸和帧数"
             value={params.categoryId}
             onChange={(event) => {
               const nextCategory = getCategory(event.target.value as GenerationParams['categoryId'])
@@ -69,8 +74,10 @@ export function ControlsPanel({
         </label>
 
         <label className="field">
-          <span>Style</span>
+          <span>美术风格</span>
           <select
+            aria-label="美术风格"
+            title="控制生成结果的整体画风"
             value={params.styleId}
             onChange={(event) => onParamsChange({ ...params, styleId: event.target.value })}
           >
@@ -83,8 +90,10 @@ export function ControlsPanel({
         </label>
 
         <label className="field">
-          <span>Size</span>
+          <span>输出尺寸</span>
           <select
+            aria-label="输出尺寸"
+            title="选择单帧素材尺寸；像素素材常用 64x64 或 128x128"
             value={params.size}
             onChange={(event) => onParamsChange({ ...params, size: event.target.value as AssetSize })}
           >
@@ -97,8 +106,10 @@ export function ControlsPanel({
         </label>
 
         <label className="field">
-          <span>Frames</span>
+          <span>动画帧数</span>
           <input
+            aria-label="动画帧数"
+            title="静态素材用 1 帧，角色或怪物动画常用 4 帧，特效可用 6 帧"
             type="number"
             min={1}
             max={8}
@@ -114,8 +125,10 @@ export function ControlsPanel({
       </div>
 
       <label className="field">
-        <span>Palette</span>
+        <span>调色板</span>
         <select
+          aria-label="调色板"
+          title="选择生成结果的主色倾向"
           value={params.paletteId}
           onChange={(event) => onParamsChange({ ...params, paletteId: event.target.value })}
         >
@@ -134,29 +147,35 @@ export function ControlsPanel({
       </div>
 
       <label className="field">
-        <span>Seed</span>
+        <span>随机种子</span>
         <input
+          aria-label="随机种子"
+          placeholder="例如：forest-jam-01"
+          title="用于控制可复现性；保留同一个种子更容易得到稳定方向"
           value={params.seed}
           onChange={(event) => onParamsChange({ ...params, seed: event.target.value })}
         />
+        <small>用于复现结果和保持同一批素材风格一致；不确定时可保留默认值。</small>
       </label>
 
       <div className="toggle-grid">
         <label className="toggle-row">
           <input
+            aria-label="沿用选中风格"
             type="checkbox"
             checked={params.styleLock}
             onChange={(event) => onParamsChange({ ...params, styleLock: event.target.checked })}
           />
-          <span>Style Lock</span>
+          <span>沿用选中风格</span>
         </label>
         <label className="toggle-row">
           <input
+            aria-label="透明背景"
             type="checkbox"
             checked={params.transparent}
             onChange={(event) => onParamsChange({ ...params, transparent: event.target.checked })}
           />
-          <span>Transparent</span>
+          <span>透明背景</span>
         </label>
       </div>
 
@@ -165,24 +184,31 @@ export function ControlsPanel({
           type="button"
           className={mode === 'openai' ? 'is-active' : ''}
           onClick={() => onModeChange('openai')}
+          title="调用本地后端代理连接 OpenAI 图像生成接口"
         >
-          OpenAI
+          AI 生成
         </button>
         <button
           type="button"
           className={mode === 'mock' ? 'is-active' : ''}
           onClick={() => onModeChange('mock')}
+          title="使用本地模拟生成，适合快速预览工作流"
         >
-          Mock
+          本地预览
         </button>
-        <button type="button" className={mode === 'demo' ? 'is-active' : ''} onClick={() => onModeChange('demo')}>
-          Demo
+        <button
+          type="button"
+          className={mode === 'demo' ? 'is-active' : ''}
+          onClick={() => onModeChange('demo')}
+          title="使用内置样例，适合稳定演示"
+        >
+          样例演示
         </button>
       </div>
 
       <button type="button" className="primary-action" onClick={onGenerate} disabled={isGenerating}>
         <WandSparkles size={17} />
-        {isGenerating ? 'Generating...' : 'Generate Assets'}
+        {isGenerating ? '生成中...' : '生成素材'}
       </button>
     </section>
   )

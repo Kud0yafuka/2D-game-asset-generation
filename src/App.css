@@ -21,7 +21,6 @@
 }
 
 .brand-lockup,
-.top-actions,
 .panel-heading,
 .queue-header,
 .asset-card-meta,
@@ -62,30 +61,6 @@
 .queue-row span {
   color: var(--text-soft);
   font-size: 12px;
-}
-
-.top-actions {
-  gap: 8px;
-}
-
-.api-pill {
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 11px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: #fff;
-}
-
-.api-pill.is-ready {
-  color: #136c5f;
-  border-color: rgba(19, 108, 95, 0.22);
-  background: rgba(19, 108, 95, 0.08);
 }
 
 .icon-button,
@@ -136,8 +111,7 @@
 .library-panel,
 .queue-panel,
 .controls-panel,
-.inspector-panel,
-.submission-panel {
+.inspector-panel {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow);
@@ -198,8 +172,7 @@
 .library-panel,
 .queue-panel,
 .controls-panel,
-.inspector-panel,
-.submission-panel {
+.inspector-panel {
   border-radius: 8px;
 }
 
@@ -467,8 +440,7 @@
 }
 
 .controls-panel,
-.inspector-panel,
-.submission-panel {
+.inspector-panel {
   padding: 16px;
 }
 
@@ -493,6 +465,12 @@
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.field small {
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .field input,
@@ -637,45 +615,6 @@
   background: #fbfcfa;
   font-size: 12px;
   font-weight: 780;
-}
-
-.review-grid {
-  display: grid;
-  gap: 8px;
-}
-
-.review-card {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 6px 10px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: #fbfcfa;
-}
-
-.review-card div {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
-  color: var(--text-strong);
-}
-
-.review-card strong,
-.review-card b {
-  font-size: 12px;
-}
-
-.review-card b {
-  color: #136c5f;
-}
-
-.review-card span {
-  grid-column: 1 / -1;
-  color: var(--text-soft);
-  font-size: 12px;
-  line-height: 1.4;
 }
 
 .compact {

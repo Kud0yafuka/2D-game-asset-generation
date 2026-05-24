@@ -1,11 +1,6 @@
-import { Cloud, Download, FolderInput, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 
-interface TopBarProps {
-  statusLabel: string
-  isReady?: boolean
-}
-
-export function TopBar({ statusLabel, isReady = true }: TopBarProps) {
+export function TopBar() {
   return (
     <header className="top-bar">
       <div className="brand-lockup">
@@ -16,19 +11,6 @@ export function TopBar({ statusLabel, isReady = true }: TopBarProps) {
           <h1>SpriteCraft Studio</h1>
           <span>Forest Jam Kit</span>
         </div>
-      </div>
-
-      <div className="top-actions" aria-label="Project actions">
-        <div className={`api-pill ${isReady ? 'is-ready' : 'is-muted'}`}>
-          <Cloud size={15} />
-          <span>{statusLabel}</span>
-        </div>
-        <button type="button" className="icon-button" title="Import project">
-          <FolderInput size={17} />
-        </button>
-        <button type="button" className="icon-button" title="Export workspace">
-          <Download size={17} />
-        </button>
       </div>
     </header>
   )
