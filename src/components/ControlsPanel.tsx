@@ -163,6 +163,13 @@ export function ControlsPanel({
       <div className="mode-switch">
         <button
           type="button"
+          className={mode === 'openai' ? 'is-active' : ''}
+          onClick={() => onModeChange('openai')}
+        >
+          OpenAI
+        </button>
+        <button
+          type="button"
           className={mode === 'mock' ? 'is-active' : ''}
           onClick={() => onModeChange('mock')}
         >

@@ -9,7 +9,7 @@ export type AssetCategoryId =
 
 export type PreviewMode = 'single' | 'sheet' | 'checker' | 'animation'
 
-export type GenerationMode = 'mock' | 'demo'
+export type GenerationMode = 'openai' | 'mock' | 'demo'
 
 export type EngineTarget = 'unity' | 'godot' | 'web'
 

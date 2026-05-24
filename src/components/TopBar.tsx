@@ -2,9 +2,10 @@ import { Cloud, Download, FolderInput, Sparkles } from 'lucide-react'
 
 interface TopBarProps {
   statusLabel: string
+  isReady?: boolean
 }
 
-export function TopBar({ statusLabel }: TopBarProps) {
+export function TopBar({ statusLabel, isReady = true }: TopBarProps) {
   return (
     <header className="top-bar">
       <div className="brand-lockup">
@@ -18,7 +19,7 @@ export function TopBar({ statusLabel }: TopBarProps) {
       </div>
 
       <div className="top-actions" aria-label="Project actions">
-        <div className="api-pill is-ready">
+        <div className={`api-pill ${isReady ? 'is-ready' : 'is-muted'}`}>
           <Cloud size={15} />
           <span>{statusLabel}</span>
         </div>

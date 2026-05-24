@@ -11,8 +11,9 @@ The first three pull requests establish the project foundation, the product shel
 - PR 1: React + Vite + TypeScript scaffold, CI, documentation, and competition framing.
 - PR 2: SpriteCraft Studio editor layout, design system, static demo asset library, preview modes, parameter panel, queue shell, and inspector shell.
 - PR 3: Mock generation workflow with local asset creation, queue state, prompt validation, history updates, and Style Lock behavior.
+- PR 4: Real OpenAI image generation through a local API proxy with mock fallback for demo safety.
 
-The real AI generation endpoint and export pipeline are intentionally scheduled for later PRs so the repository shows a clear 72-hour iteration process.
+The export pipeline is intentionally scheduled for a later PR so the repository shows a clear 72-hour iteration process.
 
 ## Product Direction
 
@@ -37,6 +38,8 @@ SpriteCraft Studio is designed as a real editor surface rather than a marketing 
 npm install
 npm run dev
 ```
+
+For OpenAI-backed generation, create `.env.local` from `.env.example` and set `OPENAI_API_KEY`. The browser never receives this key; requests go through the local API proxy.
 
 Run quality checks:
 
