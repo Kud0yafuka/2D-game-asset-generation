@@ -8,6 +8,7 @@ import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { assetCategories, getCategory } from './data/catalog'
 import { initialAssets } from './data/initialAssets'
+import { generateMockAssets } from './services/mockGeneration'
 import type {
   AssetCategoryId,
   EngineTarget,
@@ -48,8 +49,9 @@ function App() {
   const [assets, setAssets] = useState<GameAsset[]>(initialAssets)
   const [selectedId, setSelectedId] = useState(initialAssets[0]?.id)
   const [previewMode, setPreviewMode] = useState<PreviewMode>('single')
-  const [generationMode, setGenerationMode] = useState<GenerationMode>('openai')
+  const [generationMode, setGenerationMode] = useState<GenerationMode>('mock')
   const [tasks, setTasks] = useState<GenerationTask[]>(bootTasks)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [engineTarget, setEngineTarget] = useState<EngineTarget>('godot')
 
   const selectedAsset = useMemo(
@@ -104,28 +106,60 @@ function App() {
     )
   }
 
-  function runGenerationShell() {
+  async function runGeneration() {
     const taskId = `task-${Date.now()}`
     const category = getCategory(params.categoryId)
+    const prompt = params.prompt.trim()
     const task: GenerationTask = {
       id: taskId,
       label: `${category.shortLabel} / ${params.frameCount} frames`,
-      status: 'queued',
+      status: prompt.length < 4 ? 'failed' : 'running',
       startedAt: new Date().toISOString(),
-      completedAt: new Date().toISOString(),
-      message: 'PR2 shell only; generator lands in PR3',
+      completedAt: prompt.length < 4 ? new Date().toISOString() : undefined,
+      message:
+        prompt.length < 4
+          ? 'Prompt needs more detail'
+          : params.styleLock && selectedAsset
+            ? `Using style lock from ${selectedAsset.name}`
+            : 'Generating local candidates',
     }
 
     setTasks((current) => [task, ...current])
+    if (prompt.length < 4) {
+      return
+    }
+
+    setIsGenerating(true)
+    const result = await generateMockAssets(params, selectedAsset, generationMode)
+    const generatedAssets = result.assets
+
+    setAssets((current) => [...generatedAssets, ...current])
+    setSelectedId(generatedAssets[0]?.id)
+    setActiveCategory(params.categoryId)
+    setTasks((current) =>
+      current.map((item) =>
+        item.id === taskId
+          ? {
+              ...item,
+              status: 'done',
+              completedAt: new Date().toISOString(),
+              message: `${generatedAssets.length} assets ready / ${result.message}`,
+            }
+          : item,
+      ),
+    )
+    setIsGenerating(false)
   }
 
   function retryLast() {
-    runGenerationShell()
+    if (!isGenerating) {
+      void runGeneration()
+    }
   }
 
   return (
     <div className="app-shell">
-      <TopBar statusLabel="PR2 design shell" />
+      <TopBar statusLabel="PR3 mock workflow" />
       <div className="editor-layout">
         <Sidebar activeId={activeCategory} counts={counts} onSelect={updateActiveCategory} />
 
@@ -164,10 +198,10 @@ function App() {
           <ControlsPanel
             params={params}
             mode={generationMode}
-            isGenerating={false}
+            isGenerating={isGenerating}
             onParamsChange={updateParams}
             onModeChange={setGenerationMode}
-            onGenerate={runGenerationShell}
+            onGenerate={() => void runGeneration()}
           />
           <InspectorPanel
             asset={selectedAsset}

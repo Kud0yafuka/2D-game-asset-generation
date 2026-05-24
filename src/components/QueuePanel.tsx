@@ -24,7 +24,7 @@ export function QueuePanel({ tasks, onRetry }: QueuePanelProps) {
         </button>
       </div>
       <div className="queue-list">
-        {tasks.slice(0, 5).map((task) => {
+        {tasks.slice(0, 6).map((task) => {
           const Icon = statusIcon[task.status]
           return (
             <div className={`queue-row is-${task.status}`} key={task.id}>
