@@ -1,5 +1,13 @@
 import { Download, FileJson, Package, Star } from 'lucide-react'
 import { engineTargets, getCategory, getPalette, getStyle } from '../data/catalog'
+import {
+  assetMetadata,
+  buildSpriteSheet,
+  downloadBlob,
+  downloadText,
+  exportEngineZip,
+  imageSourceToBlob,
+} from '../lib/exporters'
 import type { EngineTarget, GameAsset } from '../types'
 
 interface InspectorPanelProps {
@@ -11,6 +19,27 @@ interface InspectorPanelProps {
 
 export function InspectorPanel({ asset, target, onTargetChange, onToggleFavorite }: InspectorPanelProps) {
   const palette = asset ? getPalette(asset.paletteId) : undefined
+
+  async function exportPng() {
+    if (!asset) {
+      return
+    }
+    downloadBlob(`${asset.name}.png`, await imageSourceToBlob(asset.imageSrc))
+  }
+
+  async function exportSheet() {
+    if (!asset) {
+      return
+    }
+    downloadBlob(`${asset.name}.sheet.png`, await buildSpriteSheet(asset))
+  }
+
+  function exportJson() {
+    if (!asset) {
+      return
+    }
+    downloadText(`${asset.name}.metadata.json`, JSON.stringify(assetMetadata(asset, target), null, 2))
+  }
 
   return (
     <section className="inspector-panel" aria-label="Asset inspector">
@@ -86,19 +115,19 @@ export function InspectorPanel({ asset, target, onTargetChange, onToggleFavorite
           </label>
 
           <div className="export-grid">
-            <button type="button" disabled>
+            <button type="button" onClick={() => void exportPng()}>
               <Download size={15} />
               PNG
             </button>
-            <button type="button" disabled>
+            <button type="button" onClick={() => void exportSheet()}>
               <Package size={15} />
               Sheet
             </button>
-            <button type="button" disabled>
+            <button type="button" onClick={exportJson}>
               <FileJson size={15} />
               JSON
             </button>
-            <button type="button" disabled>
+            <button type="button" onClick={() => void exportEngineZip(asset, target)}>
               <Package size={15} />
               ZIP
             </button>

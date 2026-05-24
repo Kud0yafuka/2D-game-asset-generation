@@ -101,9 +101,9 @@
   font: inherit;
 }
 
-.export-grid button:disabled {
-  cursor: not-allowed;
-  opacity: 0.58;
+.export-grid button:hover {
+  border-color: rgba(19, 108, 95, 0.36);
+  background: rgba(19, 108, 95, 0.07);
 }
 
 .icon-button {
@@ -136,7 +136,8 @@
 .library-panel,
 .queue-panel,
 .controls-panel,
-.inspector-panel {
+.inspector-panel,
+.submission-panel {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow);
@@ -197,7 +198,8 @@
 .library-panel,
 .queue-panel,
 .controls-panel,
-.inspector-panel {
+.inspector-panel,
+.submission-panel {
   border-radius: 8px;
 }
 
@@ -465,7 +467,8 @@
 }
 
 .controls-panel,
-.inspector-panel {
+.inspector-panel,
+.submission-panel {
   padding: 16px;
 }
 
@@ -634,6 +637,45 @@
   background: #fbfcfa;
   font-size: 12px;
   font-weight: 780;
+}
+
+.review-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.review-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fbfcfa;
+}
+
+.review-card div {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--text-strong);
+}
+
+.review-card strong,
+.review-card b {
+  font-size: 12px;
+}
+
+.review-card b {
+  color: #136c5f;
+}
+
+.review-card span {
+  grid-column: 1 / -1;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .compact {

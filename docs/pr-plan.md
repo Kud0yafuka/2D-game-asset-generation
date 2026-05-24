@@ -14,3 +14,8 @@ Current local scope: PR 3 is prepared locally but should not be pushed until the
 | 6 | Demo polish and submission docs | Demo script, screenshots, judging highlights |
 
 Commit messages are intentionally small and behavior-oriented, with each PR keeping the app runnable.
+
+Final PR status:
+
+- PR 1 through PR 5 build the product workflow.
+- PR 6 packages the work for review with final UI polish, architecture notes, and submission talking points.
