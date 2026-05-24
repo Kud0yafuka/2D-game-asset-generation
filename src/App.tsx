@@ -5,6 +5,7 @@ import { InspectorPanel } from './components/InspectorPanel'
 import { PreviewStage } from './components/PreviewStage'
 import { QueuePanel } from './components/QueuePanel'
 import { Sidebar } from './components/Sidebar'
+import { SubmissionPanel } from './components/SubmissionPanel'
 import { TopBar } from './components/TopBar'
 import { assetCategories, getCategory } from './data/catalog'
 import { initialAssets } from './data/initialAssets'
@@ -173,7 +174,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <TopBar statusLabel={generationMode === 'openai' ? apiHealth?.model ?? 'API checking' : 'PR4 API ready'} />
+      <TopBar statusLabel={generationMode === 'openai' ? apiHealth?.model ?? 'API checking' : 'PR6 submission ready'} />
       <div className="editor-layout">
         <Sidebar activeId={activeCategory} counts={counts} onSelect={updateActiveCategory} />
 
@@ -223,6 +224,7 @@ function App() {
             onTargetChange={setEngineTarget}
             onToggleFavorite={toggleFavorite}
           />
+          <SubmissionPanel />
         </aside>
       </div>
     </div>

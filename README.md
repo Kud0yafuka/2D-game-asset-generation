@@ -6,14 +6,16 @@ This repository is being built for the XEngineer competition topic: 2D game asse
 
 ## Current Milestone
 
-The first three pull requests establish the project foundation, the product shell, and the first working local generation workflow:
+The six pull requests establish a complete competition-ready workflow:
 
 - PR 1: React + Vite + TypeScript scaffold, CI, documentation, and competition framing.
 - PR 2: SpriteCraft Studio editor layout, design system, static demo asset library, preview modes, parameter panel, queue shell, and inspector shell.
 - PR 3: Mock generation workflow with local asset creation, queue state, prompt validation, history updates, and Style Lock behavior.
 - PR 4: Real OpenAI image generation through a local API proxy with mock fallback for demo safety.
+- PR 5: Editing and export pipeline with PNG, sprite sheet, metadata JSON, and engine-ready ZIP output.
+- PR 6: Demo polish, submission readiness panel, architecture notes, and final presentation materials.
 
-The export pipeline is intentionally scheduled for a later PR so the repository shows a clear 72-hour iteration process.
+The PR sequence is intentionally staged so the repository shows a credible 72-hour solo development process.
 
 ## Product Direction
 
@@ -23,6 +25,8 @@ SpriteCraft Studio is designed as a real editor surface rather than a marketing 
 - Preview modes: single image, sprite sheet, alpha checkerboard, and animation playback.
 - Prompt controls: style, size, frame count, palette, seed, transparency, and style lock.
 - Inspector: selected asset metadata, engine target, and planned export actions.
+- Export pipeline: preview PNG, sprite sheet PNG, metadata JSON, and Unity/Godot/Web ZIP structure.
+- Submission readiness: final judging map for product completeness, development quality, and demo presentation.
 
 ## Tech Stack
 
@@ -60,3 +64,10 @@ The implementation is planned around six focused pull requests:
 6. Demo polish and submission docs.
 
 Each PR keeps the main branch runnable and includes focused commits, making the development process easy to review.
+
+Useful submission docs:
+
+- [Product design](docs/product-design.md)
+- [Architecture notes](docs/architecture.md)
+- [Demo script](docs/demo-script.md)
+- [Submission notes](docs/submission-notes.md)
