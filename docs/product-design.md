@@ -10,7 +10,7 @@ SpriteCraft Studio is an AI-assisted 2D game asset workbench for solo developers
 4. Preview the result as a single asset, sprite sheet, checkerboard transparency view, or animated frame loop.
 5. Export PNG, sprite sheet, metadata JSON, or an engine-ready ZIP.
 
-The PR 2 implementation is a product shell: it contains the editor layout, static sample assets, stateful preview modes, and visible controls. Live generation and file export are intentionally deferred to later PRs.
+The PR 3 implementation keeps generation local and deterministic: it turns the current prompt and controls into mock assets, updates the queue and history, and demonstrates Style Lock without calling a live AI API. Live OpenAI generation and file export are intentionally deferred to later PRs.
 
 ## Design Principles
 

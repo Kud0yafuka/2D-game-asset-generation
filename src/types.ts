@@ -9,7 +9,7 @@ export type AssetCategoryId =
 
 export type PreviewMode = 'single' | 'sheet' | 'checker' | 'animation'
 
-export type GenerationMode = 'openai' | 'demo'
+export type GenerationMode = 'mock' | 'demo'
 
 export type EngineTarget = 'unity' | 'godot' | 'web'
 
@@ -64,7 +64,7 @@ export interface GameAsset {
   imageSrc: string
   frames: string[]
   createdAt: string
-  source: 'openai' | 'demo'
+  source: 'openai' | 'mock' | 'demo'
   tags: string[]
   favorite: boolean
   usage: string

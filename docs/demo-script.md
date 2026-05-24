@@ -5,10 +5,11 @@
 3. Adjust style, size, frame count, palette, seed, transparency, and Style Lock controls.
 4. Switch between single preview, sprite sheet, checkerboard, and animation modes.
 5. Select a sample asset and show the inspector metadata plus planned export targets.
-6. Click Generate Assets to show the queue shell that will be wired in PR 3.
+6. Click Generate Assets to render local mock candidates, then show the newest asset selected automatically.
+7. Enable Style Lock, generate a matching monster or prop, and point out the inherited style tags.
 
 Judging points to mention:
 
-- Product completeness: editor shell, prompt controls, preview modes, inspector, export affordances.
+- Product completeness: editor shell, prompt controls, local generation, preview modes, inspector, export affordances.
 - Innovation: style lock and engine-oriented export bridge image generation to game production.
 - Code quality: typed domain model, isolated generator service, reusable UI components, CI.

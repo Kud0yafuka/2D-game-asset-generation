@@ -6,12 +6,13 @@ This repository is being built for the XEngineer competition topic: 2D game asse
 
 ## Current Milestone
 
-The first two pull requests establish the project foundation and the product shell:
+The first three pull requests establish the project foundation, the product shell, and the first working local generation workflow:
 
 - PR 1: React + Vite + TypeScript scaffold, CI, documentation, and competition framing.
 - PR 2: SpriteCraft Studio editor layout, design system, static demo asset library, preview modes, parameter panel, queue shell, and inspector shell.
+- PR 3: Mock generation workflow with local asset creation, queue state, prompt validation, history updates, and Style Lock behavior.
 
-The real AI generation endpoint, mock generation workflow, and export pipeline are intentionally scheduled for later PRs so the repository shows a clear 72-hour iteration process.
+The real AI generation endpoint and export pipeline are intentionally scheduled for later PRs so the repository shows a clear 72-hour iteration process.
 
 ## Product Direction
 

@@ -2,7 +2,7 @@
 
 SpriteCraft Studio uses six focused pull requests to show a credible solo development process.
 
-Today scope: complete PR 1 and PR 2 only. Later PRs remain planned but are not included in the current implementation branch.
+Current local scope: PR 3 is prepared locally but should not be pushed until the next development day.
 
 | PR | Theme | Review focus |
 | --- | --- | --- |
