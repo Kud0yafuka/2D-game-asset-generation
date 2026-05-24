@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AssetGrid } from './components/AssetGrid'
 import { ControlsPanel } from './components/ControlsPanel'
 import { InspectorPanel } from './components/InspectorPanel'
@@ -8,8 +8,10 @@ import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { assetCategories, getCategory } from './data/catalog'
 import { initialAssets } from './data/initialAssets'
+import { fetchApiHealth, generateOpenAiAssets } from './services/apiGeneration'
 import { generateMockAssets } from './services/mockGeneration'
 import type {
+  ApiHealth,
   AssetCategoryId,
   EngineTarget,
   GameAsset,
@@ -53,6 +55,7 @@ function App() {
   const [tasks, setTasks] = useState<GenerationTask[]>(bootTasks)
   const [isGenerating, setIsGenerating] = useState(false)
   const [engineTarget, setEngineTarget] = useState<EngineTarget>('godot')
+  const [apiHealth, setApiHealth] = useState<ApiHealth | null>(null)
 
   const selectedAsset = useMemo(
     () => assets.find((asset) => asset.id === selectedId) ?? assets[0],
@@ -81,6 +84,12 @@ function App() {
     })
     return base
   }, [assets])
+
+  useEffect(() => {
+    fetchApiHealth()
+      .then(setApiHealth)
+      .catch(() => setApiHealth({ hasKey: false, model: 'unavailable' }))
+  }, [])
 
   function updateActiveCategory(nextId: AssetCategoryId) {
     setActiveCategory(nextId)
@@ -119,6 +128,8 @@ function App() {
       message:
         prompt.length < 4
           ? 'Prompt needs more detail'
+          : generationMode === 'openai'
+            ? 'Contacting OpenAI image model'
           : params.styleLock && selectedAsset
             ? `Using style lock from ${selectedAsset.name}`
             : 'Generating local candidates',
@@ -130,7 +141,10 @@ function App() {
     }
 
     setIsGenerating(true)
-    const result = await generateMockAssets(params, selectedAsset, generationMode)
+    const result =
+      generationMode === 'openai'
+        ? await generateOpenAiAssets(params, selectedAsset)
+        : await generateMockAssets(params, selectedAsset, generationMode)
     const generatedAssets = result.assets
 
     setAssets((current) => [...generatedAssets, ...current])
@@ -141,7 +155,7 @@ function App() {
         item.id === taskId
           ? {
               ...item,
-              status: 'done',
+              status: result.fallback && generationMode === 'openai' ? 'failed' : 'done',
               completedAt: new Date().toISOString(),
               message: `${generatedAssets.length} assets ready / ${result.message}`,
             }
@@ -159,7 +173,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <TopBar statusLabel="PR3 mock workflow" />
+      <TopBar statusLabel={generationMode === 'openai' ? apiHealth?.model ?? 'API checking' : 'PR4 API ready'} />
       <div className="editor-layout">
         <Sidebar activeId={activeCategory} counts={counts} onSelect={updateActiveCategory} />
 
