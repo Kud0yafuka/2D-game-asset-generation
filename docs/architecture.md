@@ -4,15 +4,15 @@ SpriteCraft Studio is split into clear product layers so the competition review 
 
 ## Frontend Shell
 
-- `src/App.tsx` owns the main workflow state: selected category, generation params, assets, queue, preview mode, engine target, and API health.
-- `src/components` contains focused editor regions: navigation, preview, asset grid, controls, queue, inspector, and submission readiness.
+- `src/App.tsx` owns the main workflow state: selected category, generation params, assets, queue, preview mode, and engine target.
+- `src/components` contains focused editor regions: navigation, preview, asset grid, controls, queue, and inspector.
 - `src/data/catalog.ts` defines product taxonomy: asset families, style presets, palette presets, sizes, and engine targets.
 
 ## Generation Flow
 
-- Mock generation lives in `src/services/mockGeneration.ts` and uses deterministic local SVG assets for reliable demos.
-- OpenAI generation lives behind `server/index.ts`, keeping `OPENAI_API_KEY` out of the browser.
-- `src/services/apiGeneration.ts` calls the local API and falls back to the mock generator if the live path fails.
+- Doubao Seedream generation lives behind `server/index.ts`, keeping `ARK_API_KEY` out of the browser.
+- `src/services/apiGeneration.ts` calls the local API directly and surfaces real failures to the queue.
+- `server/index.ts` logs the structured prompt, model, request id, duration, and success or failure reason for every generation request.
 
 ## Export Flow
 
@@ -25,4 +25,4 @@ SpriteCraft Studio is split into clear product layers so the competition review 
 - Every major control updates real local UI state.
 - Main stays runnable after each PR.
 - API key handling is server-side only.
-- Mock fallback protects the demo from network, quota, or API instability.
+- Generation failures are explicit instead of being replaced with local mock assets.

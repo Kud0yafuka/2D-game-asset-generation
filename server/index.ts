@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { randomUUID } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import dotenv from 'dotenv'
 import express from 'express'
@@ -12,9 +13,13 @@ dotenv.config()
 
 const app = express()
 const port = Number(process.env.PORT ?? 8787)
-const imageModel = process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1.5'
-const apiKey = process.env.OPENAI_API_KEY
-const openai = apiKey ? new OpenAI({ apiKey }) : null
+const arkBaseUrl = process.env.ARK_BASE_URL ?? 'https://ark.cn-beijing.volces.com/api/v3'
+const imageModel = process.env.ARK_IMAGE_MODEL ?? 'doubao-seedream-5-0-260128'
+const imageSize = process.env.ARK_IMAGE_SIZE ?? '2K'
+const requestTimeoutMs = Number(process.env.ARK_IMAGE_TIMEOUT_MS ?? 180_000)
+const watermark = process.env.ARK_IMAGE_WATERMARK === 'true'
+const apiKey = process.env.ARK_API_KEY
+const ark = apiKey ? new OpenAI({ apiKey, baseURL: arkBaseUrl, timeout: requestTimeoutMs }) : null
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 app.use(express.json({ limit: '2mb' }))
@@ -22,13 +27,131 @@ app.use(express.json({ limit: '2mb' }))
 app.get('/api/health', (_request, response) => {
   response.json({
     hasKey: Boolean(apiKey),
+    provider: 'ark',
+    baseUrl: arkBaseUrl,
     model: imageModel,
+    size: imageSize,
+    timeoutMs: requestTimeoutMs,
   })
 })
 
+type ArkImageEvent = {
+  type?: string
+  b64_json?: string
+  usage?: unknown
+}
+
+type ArkImageResponse = {
+  data?: Array<{ b64_json?: string; url?: string }>
+}
+
+function readStatus(error: unknown) {
+  if (typeof error === 'object' && error !== null && 'status' in error) {
+    const status = Number((error as { status?: unknown }).status)
+    return Number.isFinite(status) ? status : undefined
+  }
+
+  return undefined
+}
+
+function publicErrorMessage(error: unknown) {
+  const status = readStatus(error)
+  const message = error instanceof Error ? error.message : 'Image generation failed'
+
+  if (status === 401) {
+    return 'Ark API Key 无效或无权限，请检查本地 .env.local。'
+  }
+
+  if (status === 429) {
+    return 'Ark 请求被限流或额度不足，请稍后重试。'
+  }
+
+  if (status && status >= 400 && status < 500) {
+    return `Seedream 请求参数被拒绝：${message}`
+  }
+
+  if (/timed out|timeout/i.test(message)) {
+    return `Doubao Seedream 请求超时（${requestTimeoutMs}ms），没有生成本地假素材。`
+  }
+
+  if (/connection|network|fetch failed/i.test(message)) {
+    return `无法连接 Ark/Seedream 图像服务：${message}`
+  }
+
+  return `Doubao Seedream 生成失败：${message}`
+}
+
+function imageDataUrlFromBase64(base64: string) {
+  const mime = base64.startsWith('/9j/')
+    ? 'image/jpeg'
+    : base64.startsWith('UklGR')
+      ? 'image/webp'
+      : 'image/png'
+
+  return `data:${mime};base64,${base64}`
+}
+
+async function generateSeedreamFrames(prompt: string, frameCount: number) {
+  if (!ark) {
+    throw new Error('ARK_API_KEY is not configured')
+  }
+
+  const maxImages = Math.min(Math.max(frameCount, 1), 4)
+
+  if (maxImages === 1) {
+    const result = (await ark.images.generate({
+      model: imageModel,
+      prompt,
+      size: imageSize,
+      response_format: 'b64_json',
+      watermark,
+    } as never)) as ArkImageResponse
+
+    return (
+      result.data
+        ?.map((image) => image.b64_json)
+        .filter((image): image is string => Boolean(image))
+        .map(imageDataUrlFromBase64) ?? []
+    )
+  }
+
+  const frames: string[] = []
+  const stream = (await ark.images.generate({
+    model: imageModel,
+    prompt,
+    size: imageSize,
+    response_format: 'b64_json',
+    stream: true,
+    watermark,
+    sequential_image_generation: 'auto',
+    sequential_image_generation_options: {
+      max_images: maxImages,
+    },
+  } as never)) as unknown as AsyncIterable<ArkImageEvent>
+
+  for await (const event of stream) {
+    if (!event) {
+      continue
+    }
+
+    if (event.type === 'image_generation.partial_succeeded' && event.b64_json) {
+      frames.push(imageDataUrlFromBase64(event.b64_json))
+    }
+
+    if (event.type === 'image_generation.completed') {
+      break
+    }
+  }
+
+  return frames
+}
+
 app.post('/api/generate', async (request, response) => {
-  if (!openai) {
-    response.status(503).json({ message: 'OPENAI_API_KEY is not configured' })
+  const requestId = randomUUID()
+  const startedAt = Date.now()
+
+  if (!ark) {
+    response.status(503).json({ message: 'ARK_API_KEY is not configured' })
     return
   }
 
@@ -44,37 +167,33 @@ app.post('/api/generate', async (request, response) => {
 
   try {
     const prompt = buildStructuredPrompt(body.params, body.lockedAsset)
-    const result = await openai.images.generate({
-      model: imageModel,
-      prompt,
-      n: Math.min(Math.max(body.params.frameCount, 1), 4),
-      size: '1024x1024',
-      quality: 'medium',
-      output_format: 'png',
-      background: imageModel.startsWith('gpt-image-2')
-        ? body.params.transparent
-          ? 'auto'
-          : 'opaque'
-        : body.params.transparent
-          ? 'transparent'
-          : 'opaque',
-    })
+    console.info(
+      JSON.stringify({
+        event: 'image.generate.start',
+        requestId,
+        provider: 'ark',
+        baseUrl: arkBaseUrl,
+        model: imageModel,
+        imageSize,
+        categoryId: body.params.categoryId,
+        styleId: body.params.styleId,
+        frameCount: body.params.frameCount,
+        seed: body.params.seed,
+        prompt,
+      }),
+    )
 
-    const frames =
-      result.data
-        ?.map((image) => image.b64_json)
-        .filter((image): image is string => Boolean(image))
-        .map((image) => `data:image/png;base64,${image}`) ?? []
+    const frames = await generateSeedreamFrames(prompt, body.params.frameCount)
 
     if (frames.length === 0) {
-      throw new Error('Image API returned no image data')
+      throw new Error('Seedream API returned no image data')
     }
 
     const category = getCategory(body.params.categoryId)
     const palette = getPalette(body.params.paletteId)
     const style = getStyle(body.params.styleId)
     const asset: GameAsset = {
-      id: `openai-${Date.now()}`,
+      id: `seedream-${Date.now()}`,
       name: createAssetName(body.params, 0),
       categoryId: body.params.categoryId,
       prompt,
@@ -86,25 +205,49 @@ app.post('/api/generate', async (request, response) => {
       imageSrc: frames[0],
       frames,
       createdAt: new Date().toISOString(),
-      source: 'openai',
+      source: 'seedream',
       tags: [category.shortLabel, style.label, palette.label, `${frames.length} frames`],
       favorite: false,
       usage:
         frames.length > 1
-          ? 'OpenAI generated frame sequence ready for sprite sheet preview'
-          : 'OpenAI generated game asset ready for engine export',
+          ? 'Doubao Seedream generated frame sequence ready for sprite sheet preview'
+          : 'Doubao Seedream generated game asset ready for engine export',
     }
 
     const payload: GenerateAssetsResponse = {
       assets: [asset],
-      fallback: false,
-      message: `OpenAI generated ${frames.length} frame${frames.length > 1 ? 's' : ''}`,
+      message: `Doubao Seedream generated ${frames.length} frame${frames.length > 1 ? 's' : ''}`,
+      structuredPrompt: prompt,
     }
 
+    console.info(
+      JSON.stringify({
+        event: 'image.generate.success',
+        requestId,
+        provider: 'ark',
+        model: imageModel,
+        elapsedMs: Date.now() - startedAt,
+        frameCount: frames.length,
+      }),
+    )
     response.json(payload)
   } catch (error) {
+    const message = publicErrorMessage(error)
+    console.error(
+      JSON.stringify({
+        event: 'image.generate.failure',
+        requestId,
+        provider: 'ark',
+        model: imageModel,
+        elapsedMs: Date.now() - startedAt,
+        status: readStatus(error),
+        message,
+        rawMessage: error instanceof Error ? error.message : String(error),
+      }),
+    )
+
     response.status(502).json({
-      message: error instanceof Error ? error.message : 'Image generation failed',
+      message,
     })
   }
 })

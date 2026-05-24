@@ -6,23 +6,19 @@ import {
   palettePresets,
   stylePresets,
 } from '../data/catalog'
-import type { AssetSize, GenerationMode, GenerationParams } from '../types'
+import type { AssetSize, GenerationParams } from '../types'
 
 interface ControlsPanelProps {
   params: GenerationParams
-  mode: GenerationMode
   isGenerating: boolean
   onParamsChange: (params: GenerationParams) => void
-  onModeChange: (mode: GenerationMode) => void
   onGenerate: () => void
 }
 
 export function ControlsPanel({
   params,
-  mode,
   isGenerating,
   onParamsChange,
-  onModeChange,
   onGenerate,
 }: ControlsPanelProps) {
   const category = getCategory(params.categoryId)
@@ -179,34 +175,13 @@ export function ControlsPanel({
         </label>
       </div>
 
-      <div className="mode-switch">
-        <button
-          type="button"
-          className={mode === 'openai' ? 'is-active' : ''}
-          onClick={() => onModeChange('openai')}
-          title="调用本地后端代理连接 OpenAI 图像生成接口"
-        >
-          AI 生成
-        </button>
-        <button
-          type="button"
-          className={mode === 'mock' ? 'is-active' : ''}
-          onClick={() => onModeChange('mock')}
-          title="使用本地模拟生成，适合快速预览工作流"
-        >
-          本地预览
-        </button>
-        <button
-          type="button"
-          className={mode === 'demo' ? 'is-active' : ''}
-          onClick={() => onModeChange('demo')}
-          title="使用内置样例，适合稳定演示"
-        >
-          样例演示
-        </button>
-      </div>
-
-      <button type="button" className="primary-action" onClick={onGenerate} disabled={isGenerating}>
+      <button
+        type="button"
+        className="primary-action"
+        onClick={onGenerate}
+        disabled={isGenerating}
+        title="调用 Doubao Seedream 生成真实 2D 游戏素材"
+      >
         <WandSparkles size={17} />
         {isGenerating ? '生成中...' : '生成素材'}
       </button>

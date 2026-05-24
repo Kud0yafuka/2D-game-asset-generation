@@ -9,8 +9,6 @@ export type AssetCategoryId =
 
 export type PreviewMode = 'single' | 'sheet' | 'checker' | 'animation'
 
-export type GenerationMode = 'openai' | 'mock' | 'demo'
-
 export type EngineTarget = 'unity' | 'godot' | 'web'
 
 export type TaskStatus = 'queued' | 'running' | 'done' | 'failed'
@@ -64,7 +62,7 @@ export interface GameAsset {
   imageSrc: string
   frames: string[]
   createdAt: string
-  source: 'openai' | 'mock' | 'demo'
+  source: 'seedream'
   tags: string[]
   favorite: boolean
   usage: string
@@ -86,6 +84,6 @@ export interface ApiHealth {
 
 export interface GenerateAssetsResponse {
   assets: GameAsset[]
-  fallback?: boolean
   message?: string
+  structuredPrompt?: string
 }
