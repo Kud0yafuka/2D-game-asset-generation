@@ -173,7 +173,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <TopBar statusLabel={generationMode === 'openai' ? apiHealth?.model ?? 'API checking' : 'PR4 API ready'} />
+      <TopBar statusLabel={generationMode === 'openai' ? apiHealth?.model ?? 'API checking' : 'PR5 export ready'} />
       <div className="editor-layout">
         <Sidebar activeId={activeCategory} counts={counts} onSelect={updateActiveCategory} />
 
