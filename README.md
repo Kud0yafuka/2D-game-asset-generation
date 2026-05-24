@@ -12,8 +12,9 @@ The first three pull requests establish the project foundation, the product shel
 - PR 2: SpriteCraft Studio editor layout, design system, static demo asset library, preview modes, parameter panel, queue shell, and inspector shell.
 - PR 3: Mock generation workflow with local asset creation, queue state, prompt validation, history updates, and Style Lock behavior.
 - PR 4: Real OpenAI image generation through a local API proxy with mock fallback for demo safety.
+- PR 5: Editing and export pipeline with PNG, sprite sheet, metadata JSON, and engine-ready ZIP output.
 
-The export pipeline is intentionally scheduled for a later PR so the repository shows a clear 72-hour iteration process.
+Final demo polish is intentionally scheduled for a later PR so the repository shows a clear 72-hour iteration process.
 
 ## Product Direction
 
@@ -23,6 +24,7 @@ SpriteCraft Studio is designed as a real editor surface rather than a marketing 
 - Preview modes: single image, sprite sheet, alpha checkerboard, and animation playback.
 - Prompt controls: style, size, frame count, palette, seed, transparency, and style lock.
 - Inspector: selected asset metadata, engine target, and planned export actions.
+- Export pipeline: preview PNG, sprite sheet PNG, metadata JSON, and Unity/Godot/Web ZIP structure.
 
 ## Tech Stack
 
