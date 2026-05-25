@@ -1,85 +1,81 @@
 # SpriteCraft Studio
 
-SpriteCraft Studio is a 2D game asset generation workbench for independent game developers, Game Jam teams, and small 2D studios. The product goal is to turn short text prompts and simple parameters into game-ready assets that can later be previewed, refined, and exported into common engine workflows.
+SpriteCraft Studio 是一个面向独立游戏开发者、Game Jam 团队和小型 2D 工作室的 2D 游戏素材生成工作台。产品目标是将简短文本提示和简单参数转化为可用于游戏项目的素材，并支持后续预览、调整和导出到常见游戏引擎工作流中。
 
-This repository is being built for the XEngineer competition topic: 2D game asset generation.
+## 当前里程
 
-## Current Milestone
+- PR 1：React + Vite + TypeScript 项目脚手架、CI、文档和比赛背景说明。
+- PR 2：SpriteCraft Studio 编辑器布局、设计系统、预览模式、参数面板、队列框架和 Inspector 框架。
+- PR 3：Mock 生成工作流，包括本地素材创建、队列状态、prompt 校验、历史更新和 Style Lock 行为。
+- PR 4：通过本地 API 代理接入真实图像生成。
+- PR 5：编辑与导出流水线，支持 PNG、sprite sheet、metadata JSON 和游戏引擎可用 ZIP 输出。
+- PR 6：Demo 打磨、提交就绪面板、架构说明和最终展示材料。
+- PR 7：基于实际体验反馈进行产品可用性清理。
+- PR 8：仅保留豆包 Seedream 真实生成链路，并明确暴露 API 失败和结构化 prompt 日志。
+- PR 9：实现 PNG、sprite sheet、JSON 和引擎 ZIP 的真实导出保存流程。
+- PR 10：接入 Supabase 登录和云端素材库持久化。
 
-The staged pull requests establish a complete competition-ready workflow:
+## 产品方向
 
-- PR 1: React + Vite + TypeScript scaffold, CI, documentation, and competition framing.
-- PR 2: SpriteCraft Studio editor layout, design system, preview modes, parameter panel, queue shell, and inspector shell.
-- PR 3: Mock generation workflow with local asset creation, queue state, prompt validation, history updates, and Style Lock behavior.
-- PR 4: Real image generation through a local API proxy.
-- PR 5: Editing and export pipeline with PNG, sprite sheet, metadata JSON, and engine-ready ZIP output.
-- PR 6: Demo polish, submission readiness panel, architecture notes, and final presentation materials.
-- PR 7: Product usability cleanup based on hands-on review feedback.
-- PR 8: Doubao Seedream only generation path with explicit API failures and structured prompt logging.
-- PR 9: Real export save flow for PNG, sprite sheet, JSON, and engine ZIP.
-- PR 10: Supabase login and cloud asset library persistence.
+SpriteCraft Studio 设计为一个真实的编辑器界面，而不是营销落地页。
 
-The PR sequence is intentionally staged so the repository shows a credible 72-hour solo development process.
+首屏即包含完整工作流：
 
-## Product Direction
+- 素材类型：角色、怪物、道具、地块、UI、特效和历史记录。
+- 预览模式：单图预览、sprite sheet、透明棋盘背景和动画播放。
+- Prompt 参数：风格、尺寸、帧数、调色板、随机种子、透明背景和 Style Lock。
+- Inspector：选中素材的 metadata、目标引擎和导出操作。
+- 导出流水线：预览 PNG、sprite sheet PNG、metadata JSON，以及 Unity/Godot/Web ZIP 目录结构。
+- 云端素材库：邮箱登录、自动保存素材、刷新恢复和用户级收藏。
 
-SpriteCraft Studio is designed as a real editor surface rather than a marketing page. The first screen contains the workflow:
-
-- Asset families: character, monster, prop, tile, UI, effect, and history.
-- Preview modes: single image, sprite sheet, alpha checkerboard, and animation playback.
-- Prompt controls: style, size, frame count, palette, seed, transparency, and style lock.
-- Inspector: selected asset metadata, engine target, and planned export actions.
-- Export pipeline: preview PNG, sprite sheet PNG, metadata JSON, and Unity/Godot/Web ZIP structure.
-- Cloud library: email login, automatic asset save, refresh recovery, and per-user favorites.
-
-## Tech Stack
+## 技术栈
 
 - React 19
 - TypeScript
 - Vite
 - ESLint
-- lucide-react icons
-- Supabase Auth, Database, and Storage
+- lucide-react 图标
+- Supabase Auth、Database 和 Storage
 
-## Local Development
+## 本地开发
 
 ```bash
 npm install
 npm run dev
 ```
 
-For Doubao Seedream-backed generation, create `.env.local` from `.env.example` and set `ARK_API_KEY`. The browser never receives this key; requests go through the local API proxy.
+如需使用豆包 Seedream 真实生成，请基于 `.env.example` 创建 `.env.local`，并设置 `ARK_API_KEY`。浏览器端不会接触该 key，所有请求都会通过本地 API 代理转发。
 
-For persistent user asset libraries, set the Supabase variables in `.env.local` and run the SQL migration in [Supabase setup](docs/supabase-setup.md).
+如需启用用户素材库持久化，请在 `.env.local` 中设置 Supabase 相关变量，并参考 [Supabase setup](docs/supabase-setup.md) 完成配置。
 
-Run quality checks:
+运行质量检查：
 
 ```bash
 npm run lint
 npm run build
 ```
 
-## Competition Notes
+## 比赛说明
 
-The implementation is planned around focused pull requests:
+项目按聚焦的 PR 节奏推进：
 
-1. Project bootstrap and competition setup.
-2. Product shell and design system.
-3. Mock asset workflow.
-4. Real AI generation integration.
-5. Editing and export pipeline.
-6. Demo polish and submission docs.
-7. Product usability cleanup.
-8. Doubao Seedream only generation.
-9. Export save flow fix.
-10. User login and cloud persistence.
+1. 项目初始化与比赛配置。
+2. 产品主界面和设计系统。
+3. Mock 素材生成工作流。
+4. 真实 AI 生成接入。
+5. 编辑与导出流水线。
+6. Demo 打磨与提交文档。
+7. 产品可用性清理。
+8. 仅保留豆包 Seedream 真实生成链路。
+9. 导出保存流程修复。
+10. 用户登录与云端持久化。
 
-Each PR keeps the main branch runnable and includes focused commits, making the development process easy to review.
+每个 PR 都保持 `main` 分支可运行，并包含聚焦的提交，方便评审理解开发过程。
 
-Useful submission docs:
+有用的提交文档：
 
-- [Product design](docs/product-design.md)
-- [Architecture notes](docs/architecture.md)
-- [Supabase setup](docs/supabase-setup.md)
-- [Demo script](docs/demo-script.md)
-- [Submission notes](docs/submission-notes.md)
+- [产品设计](docs/product-design.md)
+- [架构说明](docs/architecture.md)
+- [Supabase 配置](docs/supabase-setup.md)
+- [Demo 脚本](docs/demo-script.md)
+- [提交说明](docs/submission-notes.md)
