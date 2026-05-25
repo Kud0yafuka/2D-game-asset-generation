@@ -10,6 +10,8 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 24.14.1
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
       - key: ARK_BASE_URL
         value: https://ark.cn-beijing.volces.com/api/v3
       - key: ARK_IMAGE_MODEL
