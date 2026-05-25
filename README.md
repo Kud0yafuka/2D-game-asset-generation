@@ -61,6 +61,19 @@ npm run lint
 npm run build
 ```
 
+## 生产部署
+
+本项目需要一个常驻 Node Web Service，因为真实生图、云端素材库和导出前的数据恢复都依赖服务端 `/api`。仓库已提供 `render.yaml`，可以直接用 Render Blueprint 部署。
+
+部署时需要配置以下环境变量：
+
+- `ARK_API_KEY`：火山方舟 Ark API Key。
+- `VITE_SUPABASE_URL`：Supabase 项目 URL。
+- `VITE_SUPABASE_ANON_KEY`：Supabase 匿名公钥，供浏览器登录使用。
+- `SUPABASE_SERVICE_ROLE_KEY`：Supabase 服务端密钥，仅在后端用于私有 Storage 写入。
+
+部署完成后，`/api/health` 会返回模型、Ark 配置和 Supabase 配置状态，用于确认线上服务是否就绪。
+
 ## 比赛说明
 
 项目按聚焦的 PR 节奏推进：

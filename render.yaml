@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: spritecraft-studio
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 24.14.1
+      - key: ARK_BASE_URL
+        value: https://ark.cn-beijing.volces.com/api/v3
+      - key: ARK_IMAGE_MODEL
+        value: doubao-seedream-5-0-260128
+      - key: ARK_IMAGE_SIZE
+        value: 2K
+      - key: ARK_IMAGE_WATERMARK
+        value: "false"
+      - key: SUPABASE_ASSET_BUCKET
+        value: spritecraft-assets
+      - key: ARK_API_KEY
+        sync: false
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
