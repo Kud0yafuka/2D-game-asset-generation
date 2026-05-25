@@ -92,6 +92,12 @@ function shouldFallbackToDownload(error: unknown) {
 }
 
 export async function saveGeneratedBlob(filename: string, type: string, createBlob: () => Promise<Blob>) {
+  const blob = await createBlob()
+
+  if (blob.size === 0) {
+    throw new Error('导出内容为空，请重新生成素材后再导出')
+  }
+
   const picker = window as SaveFilePickerWindow
   const savePicker = picker.showSaveFilePicker
 
@@ -101,7 +107,6 @@ export async function saveGeneratedBlob(filename: string, type: string, createBl
         suggestedName: filename,
         types: [acceptTypeFor(filename, type)],
       })
-      const blob = await createBlob()
       const writable = await handle.createWritable()
       await writable.write(blob)
       await writable.close()
@@ -117,7 +122,7 @@ export async function saveGeneratedBlob(filename: string, type: string, createBl
     }
   }
 
-  downloadBlobFallback(filename, await createBlob())
+  downloadBlobFallback(filename, blob)
 }
 
 export async function saveText(filename: string, content: string, type = 'application/json') {
@@ -127,6 +132,8 @@ export async function saveText(filename: string, content: string, type = 'applic
 async function loadImage(source: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image()
+    image.crossOrigin = 'anonymous'
+    image.referrerPolicy = 'no-referrer'
     image.onload = () => resolve(image)
     image.onerror = () => reject(new Error('Failed to load frame image'))
     image.src = source
@@ -135,13 +142,17 @@ async function loadImage(source: string) {
 
 function pngBlobFromCanvas(canvas: HTMLCanvasElement, errorMessage: string) {
   return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error(errorMessage))
-        return
-      }
-      resolve(blob)
-    }, 'image/png')
+    try {
+      canvas.toBlob((blob) => {
+        if (!blob || blob.size === 0) {
+          reject(new Error(errorMessage))
+          return
+        }
+        resolve(blob)
+      }, 'image/png')
+    } catch (error) {
+      reject(error instanceof Error ? error : new Error(errorMessage))
+    }
   })
 }
 
