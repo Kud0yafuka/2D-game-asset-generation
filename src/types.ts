@@ -18,6 +18,7 @@ export interface AssetCategory {
   label: string
   shortLabel: string
   description: string
+  defaultPrompt: string
   promptTemplate: string
   recommendedFrames: number
   recommendedSize: AssetSize

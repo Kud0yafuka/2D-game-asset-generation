@@ -24,7 +24,7 @@ import './App.css'
 
 const initialParams: GenerationParams = {
   categoryId: 'character',
-  prompt: 'forest ranger with tiny cape and readable idle animation',
+  prompt: getCategory('character').defaultPrompt,
   styleId: 'pixel',
   size: '128x128',
   frameCount: 4,
@@ -34,9 +34,23 @@ const initialParams: GenerationParams = {
   styleLock: false,
 }
 
+function paramsFromAsset(asset: GameAsset, current: GenerationParams): GenerationParams {
+  return {
+    ...current,
+    categoryId: asset.categoryId,
+    prompt: asset.prompt,
+    styleId: asset.styleId,
+    size: asset.size,
+    frameCount: asset.frameCount,
+    paletteId: asset.paletteId,
+    seed: asset.seed,
+  }
+}
+
 function App() {
   const [activeCategory, setActiveCategory] = useState<AssetCategoryId>('character')
   const [params, setParams] = useState<GenerationParams>(initialParams)
+  const [categoryPromptDrafts, setCategoryPromptDrafts] = useState<Record<string, string>>({})
   const [assets, setAssets] = useState<GameAsset[]>([])
   const [selectedId, setSelectedId] = useState<string | undefined>()
   const [previewMode, setPreviewMode] = useState<PreviewMode>('single')
@@ -53,17 +67,17 @@ function App() {
   const user = session?.user
   const accessToken = session?.access_token
 
-  const selectedAsset = useMemo(
-    () => assets.find((asset) => asset.id === selectedId) ?? assets[0],
-    [assets, selectedId],
-  )
-
   const visibleAssets = useMemo(() => {
     if (activeCategory === 'history') {
       return assets
     }
     return assets.filter((asset) => asset.categoryId === activeCategory)
   }, [activeCategory, assets])
+
+  const selectedAsset = useMemo(() => {
+    const selected = selectedId ? visibleAssets.find((asset) => asset.id === selectedId) : undefined
+    return selected ?? visibleAssets[0]
+  }, [selectedId, visibleAssets])
 
   const counts = useMemo(() => {
     const base: Record<AssetCategoryId, number> = {
@@ -138,6 +152,13 @@ function App() {
 
         setAssets(cloudAssets)
         setSelectedId(cloudAssets[0]?.id)
+        if (cloudAssets[0]) {
+          setParams((current) => paramsFromAsset(cloudAssets[0], current))
+          setActiveCategory(cloudAssets[0].categoryId)
+          setPreviewMode(cloudAssets[0].frames.length > 1 ? 'sheet' : 'single')
+        } else {
+          setParams(initialParams)
+        }
         setSyncMessage(`${cloudAssets.length} 个素材已从云端恢复。`)
       })
       .catch((error) => {
@@ -153,20 +174,86 @@ function App() {
     }
   }, [accessToken, authReady])
 
-  function updateActiveCategory(nextId: AssetCategoryId) {
-    setActiveCategory(nextId)
+  function promptForCategory(nextId: Exclude<AssetCategoryId, 'history'>) {
+    return categoryPromptDrafts[nextId] ?? getCategory(nextId).defaultPrompt
+  }
+
+  function syncParamsToAsset(asset: GameAsset) {
+    setParams((current) => paramsFromAsset(asset, current))
+  }
+
+  function syncParamsToEmptyCategory(nextId: Exclude<AssetCategoryId, 'history'>) {
+    const category = getCategory(nextId)
+
+    setParams((current) => ({
+      ...current,
+      categoryId: category.id,
+      prompt: promptForCategory(category.id),
+      frameCount: category.recommendedFrames,
+      size: category.recommendedSize,
+    }))
+  }
+
+  function selectAsset(asset: GameAsset) {
+    setSelectedId(asset.id)
+    setPreviewMode(asset.frames.length > 1 ? 'sheet' : 'single')
+    syncParamsToAsset(asset)
+  }
+
+  function selectCategoryFirstAsset(nextId: AssetCategoryId) {
+    const nextAsset = nextId === 'history' ? assets[0] : assets.find((asset) => asset.categoryId === nextId)
+    setSelectedId(nextAsset?.id)
+    setPreviewMode(nextAsset?.frames.length && nextAsset.frames.length > 1 ? 'sheet' : 'single')
+
+    if (nextAsset) {
+      syncParamsToAsset(nextAsset)
+      return
+    }
+
     if (nextId !== 'history') {
-      const category = getCategory(nextId)
-      setParams((current) => ({
-        ...current,
-        categoryId: category.id,
-        frameCount: category.recommendedFrames,
-        size: category.recommendedSize,
-      }))
+      syncParamsToEmptyCategory(nextId)
     }
   }
 
+  function updateActiveCategory(nextId: AssetCategoryId) {
+    setActiveCategory(nextId)
+    selectCategoryFirstAsset(nextId)
+  }
+
   function updateParams(nextParams: GenerationParams) {
+    if (nextParams.categoryId !== params.categoryId) {
+      const category = getCategory(nextParams.categoryId)
+      const nextAsset = assets.find((asset) => asset.categoryId === category.id)
+
+      if (nextAsset) {
+        setParams(paramsFromAsset(nextAsset, nextParams))
+      } else {
+        setParams({
+          ...nextParams,
+          prompt: promptForCategory(category.id),
+          frameCount: category.recommendedFrames,
+          size: category.recommendedSize,
+        })
+      }
+
+      setActiveCategory(nextParams.categoryId)
+      selectCategoryFirstAsset(nextParams.categoryId)
+      return
+    }
+
+    if (nextParams.prompt !== params.prompt) {
+      if (selectedAsset) {
+        setAssets((current) =>
+          current.map((asset) => (asset.id === selectedAsset.id ? { ...asset, prompt: nextParams.prompt } : asset)),
+        )
+      } else {
+        setCategoryPromptDrafts((current) => ({
+          ...current,
+          [nextParams.categoryId]: nextParams.prompt,
+        }))
+      }
+    }
+
     setParams(nextParams)
     setActiveCategory(nextParams.categoryId)
   }
@@ -367,7 +454,7 @@ function App() {
             <AssetGrid
               assets={visibleAssets}
               selectedId={selectedAsset?.id}
-              onSelect={(asset) => setSelectedId(asset.id)}
+              onSelect={selectAsset}
               onToggleFavorite={toggleFavorite}
             />
           </section>
