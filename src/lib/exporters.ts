@@ -1,6 +1,28 @@
 import JSZip from 'jszip'
 import { engineTargets, getCategory, getPalette, getStyle } from '../data/catalog'
-import type { EngineTarget, GameAsset } from '../types'
+import type { AssetSize, EngineTarget, GameAsset } from '../types'
+
+interface FileSaveHandle {
+  createWritable: () => Promise<{
+    write: (data: Blob) => Promise<void> | void
+    close: () => Promise<void> | void
+  }>
+}
+
+interface SaveFilePickerWindow extends Window {
+  showSaveFilePicker?: (options: {
+    suggestedName?: string
+    types?: Array<{
+      description: string
+      accept: Record<string, string[]>
+    }>
+  }) => Promise<FileSaveHandle>
+}
+
+interface PickerAcceptType {
+  description: string
+  accept: Record<string, string[]>
+}
 
 export function assetMetadata(asset: GameAsset, target: EngineTarget) {
   const engine = engineTargets.find((item) => item.id === target) ?? engineTargets[0]
@@ -28,24 +50,78 @@ export function assetMetadata(asset: GameAsset, target: EngineTarget) {
   }
 }
 
-export function downloadText(filename: string, content: string, type = 'application/json') {
-  downloadBlob(filename, new Blob([content], { type }))
+function acceptTypeFor(filename: string, type: string): PickerAcceptType {
+  if (filename.endsWith('.zip')) {
+    return { description: 'ZIP archive', accept: { 'application/zip': ['.zip'] } }
+  }
+
+  if (filename.endsWith('.json')) {
+    return { description: 'JSON metadata', accept: { 'application/json': ['.json'] } }
+  }
+
+  return { description: 'PNG image', accept: { [type]: ['.png'] } }
 }
 
-export function downloadBlob(filename: string, blob: Blob) {
+function downloadBlobFallback(filename: string, blob: Blob) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
   link.download = filename
+  link.rel = 'noopener'
   document.body.append(link)
   link.click()
   link.remove()
-  URL.revokeObjectURL(url)
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }
 
-export async function imageSourceToBlob(source: string) {
-  const response = await fetch(source)
-  return response.blob()
+function isUserCanceledSave(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  return error.name === 'AbortError' || error.message.toLowerCase().includes('aborted')
+}
+
+function shouldFallbackToDownload(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  const message = error.message.toLowerCase()
+  return error.name === 'NotAllowedError' || message.includes('user gesture') || message.includes('not allowed')
+}
+
+export async function saveGeneratedBlob(filename: string, type: string, createBlob: () => Promise<Blob>) {
+  const picker = window as SaveFilePickerWindow
+  const savePicker = picker.showSaveFilePicker
+
+  if (savePicker && window.isSecureContext) {
+    try {
+      const handle = await savePicker.call(picker, {
+        suggestedName: filename,
+        types: [acceptTypeFor(filename, type)],
+      })
+      const blob = await createBlob()
+      const writable = await handle.createWritable()
+      await writable.write(blob)
+      await writable.close()
+      return
+    } catch (error) {
+      if (isUserCanceledSave(error)) {
+        throw error
+      }
+
+      if (!shouldFallbackToDownload(error)) {
+        throw error
+      }
+    }
+  }
+
+  downloadBlobFallback(filename, await createBlob())
+}
+
+export async function saveText(filename: string, content: string, type = 'application/json') {
+  await saveGeneratedBlob(filename, type, async () => new Blob([content], { type }))
 }
 
 async function loadImage(source: string) {
@@ -55,6 +131,37 @@ async function loadImage(source: string) {
     image.onerror = () => reject(new Error('Failed to load frame image'))
     image.src = source
   })
+}
+
+function pngBlobFromCanvas(canvas: HTMLCanvasElement, errorMessage: string) {
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error(errorMessage))
+        return
+      }
+      resolve(blob)
+    }, 'image/png')
+  })
+}
+
+export async function imageSourceToPngBlob(source: string, size?: AssetSize) {
+  const image = await loadImage(source)
+  const [targetWidth, targetHeight] = size ? size.split('x').map(Number) : [image.naturalWidth, image.naturalHeight]
+  const canvas = document.createElement('canvas')
+  canvas.width = targetWidth
+  canvas.height = targetHeight
+  const context = canvas.getContext('2d')
+
+  if (!context) {
+    throw new Error('Canvas is unavailable')
+  }
+
+  context.imageSmoothingEnabled = false
+  context.clearRect(0, 0, targetWidth, targetHeight)
+  context.drawImage(image, 0, 0, targetWidth, targetHeight)
+
+  return pngBlobFromCanvas(canvas, 'Failed to render PNG')
 }
 
 export async function buildSpriteSheet(asset: GameAsset) {
@@ -74,22 +181,14 @@ export async function buildSpriteSheet(asset: GameAsset) {
     context.drawImage(image, index * width, 0, width, height)
   })
 
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error('Failed to render sprite sheet'))
-        return
-      }
-      resolve(blob)
-    }, 'image/png')
-  })
+  return pngBlobFromCanvas(canvas, 'Failed to render sprite sheet')
 }
 
-export async function exportEngineZip(asset: GameAsset, target: EngineTarget) {
+export async function buildEngineZip(asset: GameAsset, target: EngineTarget) {
   const engine = engineTargets.find((item) => item.id === target) ?? engineTargets[0]
   const root = engine.root.replace(/^res:\/\//, '').replace(/^public\//, '')
   const zip = new JSZip()
-  const previewBlob = await imageSourceToBlob(asset.imageSrc)
+  const previewBlob = await imageSourceToPngBlob(asset.imageSrc, asset.size)
   const sheetBlob = await buildSpriteSheet(asset)
   const metadata = JSON.stringify(assetMetadata(asset, target), null, 2)
 
@@ -109,5 +208,5 @@ export async function exportEngineZip(asset: GameAsset, target: EngineTarget) {
     ].join('\n'),
   )
 
-  downloadBlob(`${asset.name}.${target}.zip`, await zip.generateAsync({ type: 'blob' }))
+  return zip.generateAsync({ type: 'blob' })
 }

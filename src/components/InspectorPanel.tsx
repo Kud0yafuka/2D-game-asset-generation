@@ -1,12 +1,13 @@
+import { useState } from 'react'
 import { Download, FileJson, Package, Star } from 'lucide-react'
 import { engineTargets, getCategory, getPalette, getStyle } from '../data/catalog'
 import {
   assetMetadata,
+  buildEngineZip,
   buildSpriteSheet,
-  downloadBlob,
-  downloadText,
-  exportEngineZip,
-  imageSourceToBlob,
+  imageSourceToPngBlob,
+  saveGeneratedBlob,
+  saveText,
 } from '../lib/exporters'
 import type { EngineTarget, GameAsset } from '../types'
 
@@ -19,26 +20,66 @@ interface InspectorPanelProps {
 
 export function InspectorPanel({ asset, target, onTargetChange, onToggleFavorite }: InspectorPanelProps) {
   const palette = asset ? getPalette(asset.paletteId) : undefined
+  const [exportStatus, setExportStatus] = useState<string>()
 
-  async function exportPng() {
+  async function runExport(label: string, action: () => Promise<void>) {
     if (!asset) {
       return
     }
-    downloadBlob(`${asset.name}.png`, await imageSourceToBlob(asset.imageSrc))
+
+    setExportStatus(`${label} 导出中...`)
+    try {
+      await action()
+      setExportStatus(`${label} 已保存`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '导出失败'
+      if (message.includes('aborted') || message.includes('AbortError')) {
+        setExportStatus(`${label} 已取消`)
+        return
+      }
+
+      setExportStatus(`${label} 失败：${message}`)
+    }
   }
 
-  async function exportSheet() {
+  function exportPng() {
     if (!asset) {
       return
     }
-    downloadBlob(`${asset.name}.sheet.png`, await buildSpriteSheet(asset))
+
+    void runExport('PNG', () =>
+      saveGeneratedBlob(`${asset.name}.png`, 'image/png', async () => imageSourceToPngBlob(asset.imageSrc, asset.size)),
+    )
   }
 
   function exportJson() {
     if (!asset) {
       return
     }
-    downloadText(`${asset.name}.metadata.json`, JSON.stringify(assetMetadata(asset, target), null, 2))
+
+    void runExport('JSON', () =>
+      saveText(`${asset.name}.metadata.json`, JSON.stringify(assetMetadata(asset, target), null, 2)),
+    )
+  }
+
+  function exportSheet() {
+    if (!asset) {
+      return
+    }
+
+    void runExport('Sheet', () =>
+      saveGeneratedBlob(`${asset.name}.sheet.png`, 'image/png', async () => buildSpriteSheet(asset)),
+    )
+  }
+
+  function exportZip() {
+    if (!asset) {
+      return
+    }
+
+    void runExport('ZIP', () =>
+      saveGeneratedBlob(`${asset.name}.${target}.zip`, 'application/zip', async () => buildEngineZip(asset, target)),
+    )
   }
 
   return (
@@ -115,11 +156,11 @@ export function InspectorPanel({ asset, target, onTargetChange, onToggleFavorite
           </label>
 
           <div className="export-grid">
-            <button type="button" onClick={() => void exportPng()}>
+            <button type="button" onClick={exportPng}>
               <Download size={15} />
               PNG
             </button>
-            <button type="button" onClick={() => void exportSheet()}>
+            <button type="button" onClick={exportSheet}>
               <Package size={15} />
               Sheet
             </button>
@@ -127,11 +168,13 @@ export function InspectorPanel({ asset, target, onTargetChange, onToggleFavorite
               <FileJson size={15} />
               JSON
             </button>
-            <button type="button" onClick={() => void exportEngineZip(asset, target)}>
+            <button type="button" onClick={exportZip}>
               <Package size={15} />
               ZIP
             </button>
           </div>
+
+          {exportStatus && <p className="export-status">{exportStatus}</p>}
         </>
       ) : (
         <div className="empty-state compact">
