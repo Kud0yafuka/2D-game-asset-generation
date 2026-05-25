@@ -2,6 +2,12 @@
 
 SpriteCraft Studio 是一个面向独立游戏开发者、Game Jam 团队和小型 2D 工作室的 2D 游戏素材生成工作台。产品目标是将简短文本提示和简单参数转化为可用于游戏项目的素材，并支持后续预览、调整、保存和导出到常见游戏引擎工作流中。
 
+## Demo 展示视频
+
+- [点击查看 Demo 展示视频（MP4）](https://github.com/Kud0yafuka/2D-game-asset-generation/releases/download/demo-video-2026-05-25/SpriteCraft-Studio-demo.mp4)
+- [GitHub Release 页面](https://github.com/Kud0yafuka/2D-game-asset-generation/releases/tag/demo-video-2026-05-25)
+- [线上产品地址](https://spritecraft-studio.onrender.com)
+
 ## 当前里程
 
 - PR 1：React + Vite + TypeScript 项目脚手架、CI、文档和比赛背景说明。
