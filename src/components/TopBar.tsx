@@ -1,6 +1,11 @@
 import { Sparkles } from 'lucide-react'
+import type { ReactNode } from 'react'
 
-export function TopBar() {
+interface TopBarProps {
+  children?: ReactNode
+}
+
+export function TopBar({ children }: TopBarProps) {
   return (
     <header className="top-bar">
       <div className="brand-lockup">
@@ -12,6 +17,7 @@ export function TopBar() {
           <span>Forest Jam Kit</span>
         </div>
       </div>
+      {children}
     </header>
   )
 }

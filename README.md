@@ -16,6 +16,8 @@ The staged pull requests establish a complete competition-ready workflow:
 - PR 6: Demo polish, submission readiness panel, architecture notes, and final presentation materials.
 - PR 7: Product usability cleanup based on hands-on review feedback.
 - PR 8: Doubao Seedream only generation path with explicit API failures and structured prompt logging.
+- PR 9: Real export save flow for PNG, sprite sheet, JSON, and engine ZIP.
+- PR 10: Supabase login and cloud asset library persistence.
 
 The PR sequence is intentionally staged so the repository shows a credible 72-hour solo development process.
 
@@ -28,6 +30,7 @@ SpriteCraft Studio is designed as a real editor surface rather than a marketing 
 - Prompt controls: style, size, frame count, palette, seed, transparency, and style lock.
 - Inspector: selected asset metadata, engine target, and planned export actions.
 - Export pipeline: preview PNG, sprite sheet PNG, metadata JSON, and Unity/Godot/Web ZIP structure.
+- Cloud library: email login, automatic asset save, refresh recovery, and per-user favorites.
 
 ## Tech Stack
 
@@ -36,6 +39,7 @@ SpriteCraft Studio is designed as a real editor surface rather than a marketing 
 - Vite
 - ESLint
 - lucide-react icons
+- Supabase Auth, Database, and Storage
 
 ## Local Development
 
@@ -45,6 +49,8 @@ npm run dev
 ```
 
 For Doubao Seedream-backed generation, create `.env.local` from `.env.example` and set `ARK_API_KEY`. The browser never receives this key; requests go through the local API proxy.
+
+For persistent user asset libraries, set the Supabase variables in `.env.local` and run the SQL migration in [Supabase setup](docs/supabase-setup.md).
 
 Run quality checks:
 
@@ -65,6 +71,8 @@ The implementation is planned around focused pull requests:
 6. Demo polish and submission docs.
 7. Product usability cleanup.
 8. Doubao Seedream only generation.
+9. Export save flow fix.
+10. User login and cloud persistence.
 
 Each PR keeps the main branch runnable and includes focused commits, making the development process easy to review.
 
@@ -72,5 +80,6 @@ Useful submission docs:
 
 - [Product design](docs/product-design.md)
 - [Architecture notes](docs/architecture.md)
+- [Supabase setup](docs/supabase-setup.md)
 - [Demo script](docs/demo-script.md)
 - [Submission notes](docs/submission-notes.md)

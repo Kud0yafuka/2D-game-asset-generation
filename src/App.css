@@ -25,7 +25,9 @@
 .queue-header,
 .asset-card-meta,
 .queue-row,
-.toggle-row {
+.toggle-row,
+.auth-panel,
+.auth-actions {
   display: flex;
   align-items: center;
 }
@@ -58,7 +60,8 @@
 .brand-lockup span,
 .panel-heading span,
 .asset-card-meta small,
-.queue-row span {
+.queue-row span,
+.auth-panel span {
   color: var(--text-soft);
   font-size: 12px;
 }
@@ -68,7 +71,8 @@
 .primary-action,
 .segmented-control button,
 .asset-family-pills button,
-.export-grid button {
+.export-grid button,
+.auth-panel button {
   appearance: none;
   border: 0;
   cursor: pointer;
@@ -95,6 +99,63 @@
 .icon-button.is-favorite {
   color: #c65c34;
   border-color: rgba(198, 92, 52, 0.34);
+}
+
+.auth-panel {
+  justify-content: flex-end;
+  gap: 10px;
+  max-width: min(720px, 58vw);
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(251, 252, 250, 0.78);
+}
+
+.auth-panel > div:first-child {
+  min-width: 180px;
+}
+
+.auth-panel strong {
+  display: block;
+  color: var(--text-strong);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.auth-fields {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(120px, 0.8fr);
+  gap: 8px;
+  min-width: 300px;
+}
+
+.auth-fields input {
+  width: 100%;
+  height: 34px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  padding: 0 10px;
+}
+
+.auth-actions {
+  gap: 6px;
+}
+
+.auth-button {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #eef5f2;
+}
+
+.auth-button:disabled {
+  cursor: wait;
+  opacity: 0.62;
 }
 
 .editor-layout {
@@ -468,6 +529,13 @@
   line-height: 1.45;
 }
 
+.panel-hint {
+  margin: 10px 0 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .field input,
 .field select,
 .field textarea {
@@ -643,6 +711,19 @@
     gap: 12px;
     padding: 14px;
     flex-direction: column;
+  }
+
+  .auth-panel {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .auth-fields {
+    min-width: 0;
+    grid-template-columns: 1fr;
   }
 
   .editor-layout {
