@@ -607,6 +607,13 @@
   font-weight: 780;
 }
 
+.export-status {
+  margin: 10px 0 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .compact {
   min-height: 120px;
 }
