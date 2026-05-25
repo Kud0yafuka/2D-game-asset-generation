@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AssetGrid } from './components/AssetGrid'
+import { AuthPanel } from './components/AuthPanel'
 import { ControlsPanel } from './components/ControlsPanel'
 import { InspectorPanel } from './components/InspectorPanel'
 import { PreviewStage } from './components/PreviewStage'
@@ -8,6 +9,8 @@ import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { assetCategories, getCategory } from './data/catalog'
 import { generateOpenAiAssets } from './services/apiGeneration'
+import { listCloudAssets, saveGeneratedAssets, updateCloudFavorite } from './services/cloudLibrary'
+import { isSupabaseConfigured, supabase } from './services/supabaseClient'
 import type {
   AssetCategoryId,
   EngineTarget,
@@ -16,6 +19,7 @@ import type {
   GenerationTask,
   PreviewMode,
 } from './types'
+import type { Session } from '@supabase/supabase-js'
 import './App.css'
 
 const initialParams: GenerationParams = {
@@ -39,6 +43,15 @@ function App() {
   const [tasks, setTasks] = useState<GenerationTask[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [engineTarget, setEngineTarget] = useState<EngineTarget>('godot')
+  const [session, setSession] = useState<Session | null>(null)
+  const [authReady, setAuthReady] = useState(false)
+  const [authBusy, setAuthBusy] = useState(false)
+  const [syncMessage, setSyncMessage] = useState(
+    isSupabaseConfigured ? '登录后素材会自动同步到云端。' : 'Supabase 未配置，无法保存云端素材。',
+  )
+
+  const user = session?.user
+  const accessToken = session?.access_token
 
   const selectedAsset = useMemo(
     () => assets.find((asset) => asset.id === selectedId) ?? assets[0],
@@ -68,6 +81,78 @@ function App() {
     return base
   }, [assets])
 
+  useEffect(() => {
+    if (!supabase) {
+      setAuthReady(true)
+      return
+    }
+
+    let isMounted = true
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!isMounted) {
+        return
+      }
+
+      setSession(data.session)
+      setAuthReady(true)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession)
+    })
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!authReady) {
+      return
+    }
+
+    if (!supabase) {
+      setSyncMessage('Supabase 未配置，无法保存云端素材。')
+      return
+    }
+
+    if (!accessToken) {
+      setAssets([])
+      setSelectedId(undefined)
+      setSyncMessage('登录后素材会自动同步到云端。')
+      return
+    }
+
+    let isMounted = true
+    setSyncMessage('正在加载云端素材库...')
+
+    listCloudAssets(accessToken)
+      .then((cloudAssets) => {
+        if (!isMounted) {
+          return
+        }
+
+        setAssets(cloudAssets)
+        setSelectedId(cloudAssets[0]?.id)
+        setSyncMessage(`${cloudAssets.length} 个素材已从云端恢复。`)
+      })
+      .catch((error) => {
+        if (!isMounted) {
+          return
+        }
+
+        setSyncMessage(error instanceof Error ? `云端素材加载失败：${error.message}` : '云端素材加载失败')
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [accessToken, authReady])
+
   function updateActiveCategory(nextId: AssetCategoryId) {
     setActiveCategory(nextId)
     if (nextId !== 'history') {
@@ -87,37 +172,65 @@ function App() {
   }
 
   function toggleFavorite(assetId: string) {
+    const asset = assets.find((item) => item.id === assetId)
+    const nextFavorite = !asset?.favorite
+
     setAssets((current) =>
       current.map((asset) => (asset.id === assetId ? { ...asset, favorite: !asset.favorite } : asset)),
     )
+
+    if (accessToken) {
+      updateCloudFavorite(accessToken, assetId, nextFavorite).catch((error) => {
+        setSyncMessage(error instanceof Error ? `收藏同步失败：${error.message}` : '收藏同步失败')
+      })
+    }
   }
 
   async function runGeneration() {
     const taskId = `task-${Date.now()}`
     const category = getCategory(params.categoryId)
     const prompt = params.prompt.trim()
+    const missingAuth = !accessToken || !supabase
     const task: GenerationTask = {
       id: taskId,
       label: `${category.shortLabel} / ${params.frameCount} frames`,
-      status: prompt.length < 4 ? 'failed' : 'running',
+      status: prompt.length < 4 || missingAuth ? 'failed' : 'running',
       startedAt: new Date().toISOString(),
-      completedAt: prompt.length < 4 ? new Date().toISOString() : undefined,
-      message: prompt.length < 4 ? '素材描述需要更具体' : '正在调用 Doubao Seedream 生成真实素材',
+      completedAt: prompt.length < 4 || missingAuth ? new Date().toISOString() : undefined,
+      message:
+        prompt.length < 4
+          ? '素材描述需要更具体'
+          : missingAuth
+            ? '请先登录，生成后的素材会自动保存到你的云端素材库'
+            : '正在调用 Doubao Seedream 生成真实素材',
     }
 
     setTasks((current) => [task, ...current])
-    if (prompt.length < 4) {
+    if (prompt.length < 4 || missingAuth) {
       return
     }
 
     setIsGenerating(true)
+    let generatedAssets: GameAsset[] = []
     try {
       const result = await generateOpenAiAssets(params, selectedAsset)
-      const generatedAssets = result.assets
+      generatedAssets = result.assets
+      setTasks((current) =>
+        current.map((item) =>
+          item.id === taskId
+            ? {
+                ...item,
+                message: '正在保存到云端素材库',
+              }
+            : item,
+        ),
+      )
+      const savedAssets = await saveGeneratedAssets(accessToken, generatedAssets)
 
-      setAssets((current) => [...generatedAssets, ...current])
-      setSelectedId(generatedAssets[0]?.id)
+      setAssets((current) => [...savedAssets, ...current])
+      setSelectedId(savedAssets[0]?.id)
       setActiveCategory(params.categoryId)
+      setSyncMessage(`${savedAssets.length} 个新素材已保存到云端。`)
       setTasks((current) =>
         current.map((item) =>
           item.id === taskId
@@ -125,12 +238,18 @@ function App() {
                 ...item,
                 status: 'done',
                 completedAt: new Date().toISOString(),
-                message: `${generatedAssets.length} 个 Doubao Seedream 素材已生成`,
+                message: `${savedAssets.length} 个 Doubao Seedream 素材已生成并保存`,
               }
             : item,
         ),
       )
     } catch (error) {
+      if (generatedAssets.length > 0) {
+        setAssets((current) => [...generatedAssets, ...current])
+        setSelectedId(generatedAssets[0]?.id)
+        setSyncMessage('生成成功，但云端保存失败。请检查 Supabase Storage 配置。')
+      }
+
       setTasks((current) =>
         current.map((item) =>
           item.id === taskId
@@ -148,6 +267,58 @@ function App() {
     }
   }
 
+  async function signIn(email: string, password: string) {
+    if (!supabase) {
+      throw new Error('Supabase 未配置')
+    }
+
+    setAuthBusy(true)
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        throw error
+      }
+    } finally {
+      setAuthBusy(false)
+    }
+  }
+
+  async function signUp(email: string, password: string) {
+    if (!supabase) {
+      throw new Error('Supabase 未配置')
+    }
+
+    setAuthBusy(true)
+    try {
+      const { data, error } = await supabase.auth.signUp({ email, password })
+
+      if (error) {
+        throw error
+      }
+
+      setSyncMessage(data.session ? '注册成功，素材会自动同步到云端。' : '注册成功，请完成邮箱验证后登录。')
+    } finally {
+      setAuthBusy(false)
+    }
+  }
+
+  async function signOut() {
+    if (!supabase) {
+      return
+    }
+
+    setAuthBusy(true)
+    try {
+      await supabase.auth.signOut()
+      setAssets([])
+      setSelectedId(undefined)
+      setSyncMessage('已退出。登录后可恢复你的云端素材库。')
+    } finally {
+      setAuthBusy(false)
+    }
+  }
+
   function retryLast() {
     if (!isGenerating) {
       void runGeneration()
@@ -156,7 +327,17 @@ function App() {
 
   return (
     <div className="app-shell">
-      <TopBar />
+      <TopBar>
+        <AuthPanel
+          email={user?.email}
+          isConfigured={isSupabaseConfigured}
+          isBusy={authBusy || !authReady}
+          message={syncMessage}
+          onSignIn={signIn}
+          onSignUp={signUp}
+          onSignOut={signOut}
+        />
+      </TopBar>
       <div className="editor-layout">
         <Sidebar activeId={activeCategory} counts={counts} onSelect={updateActiveCategory} />
 
@@ -195,6 +376,8 @@ function App() {
           <ControlsPanel
             params={params}
             isGenerating={isGenerating}
+            canGenerate={Boolean(user && supabase)}
+            disabledMessage="请先登录。登录后生成的素材会自动保存，下次打开仍可恢复。"
             onParamsChange={updateParams}
             onGenerate={() => void runGeneration()}
           />

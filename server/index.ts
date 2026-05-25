@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import dotenv from 'dotenv'
 import express from 'express'
 import OpenAI from 'openai'
+import { createClient } from '@supabase/supabase-js'
 import { getCategory, getPalette, getStyle } from '../src/data/catalog.ts'
 import { buildStructuredPrompt, createAssetName } from '../src/lib/prompt.ts'
 import type { GameAsset, GenerateAssetsResponse, GenerationParams } from '../src/types.ts'
@@ -21,12 +22,26 @@ const watermark = process.env.ARK_IMAGE_WATERMARK === 'true'
 const apiKey = process.env.ARK_API_KEY
 const ark = apiKey ? new OpenAI({ apiKey, baseURL: arkBaseUrl, timeout: requestTimeoutMs }) : null
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const supabaseUrl = process.env.VITE_SUPABASE_URL
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const assetBucket = process.env.SUPABASE_ASSET_BUCKET ?? 'spritecraft-assets'
+const signedUrlTtlSeconds = 60 * 60 * 24
+const supabaseAdmin =
+  supabaseUrl && supabaseServiceRoleKey
+    ? createClient(supabaseUrl, supabaseServiceRoleKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      })
+    : null
 
-app.use(express.json({ limit: '2mb' }))
+app.use(express.json({ limit: '80mb' }))
 
 app.get('/api/health', (_request, response) => {
   response.json({
     hasKey: Boolean(apiKey),
+    hasSupabase: Boolean(supabaseAdmin),
     provider: 'ark',
     baseUrl: arkBaseUrl,
     model: imageModel,
@@ -43,6 +58,16 @@ type ArkImageEvent = {
 
 type ArkImageResponse = {
   data?: Array<{ b64_json?: string; url?: string }>
+}
+
+interface StoredFrame {
+  path: string
+  mimeType: string
+}
+
+interface StoredAsset extends Omit<GameAsset, 'imageSrc' | 'frames'> {
+  imagePath: string
+  framePaths: StoredFrame[]
 }
 
 function readStatus(error: unknown) {
@@ -89,6 +114,175 @@ function imageDataUrlFromBase64(base64: string) {
       : 'image/png'
 
   return `data:${mime};base64,${base64}`
+}
+
+function requireSupabaseAdmin() {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase is not configured')
+  }
+
+  return supabaseAdmin
+}
+
+async function readUserIdFromRequest(request: express.Request) {
+  const admin = requireSupabaseAdmin()
+  const header = request.headers.authorization
+  const token = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined
+
+  if (!token) {
+    throw new Error('Missing Supabase access token')
+  }
+
+  const { data, error } = await admin.auth.getUser(token)
+
+  if (error || !data.user) {
+    throw new Error('Invalid Supabase access token')
+  }
+
+  return data.user.id
+}
+
+async function ensureAssetBucket() {
+  const admin = requireSupabaseAdmin()
+  const { data: buckets, error: listError } = await admin.storage.listBuckets()
+
+  if (listError) {
+    throw listError
+  }
+
+  if (buckets.some((bucket) => bucket.name === assetBucket)) {
+    return
+  }
+
+  const { error } = await admin.storage.createBucket(assetBucket, {
+    public: false,
+    allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'application/json'],
+    fileSizeLimit: 10 * 1024 * 1024,
+  })
+
+  if (error) {
+    throw error
+  }
+}
+
+function extensionForMimeType(mimeType: string) {
+  if (mimeType === 'image/jpeg') {
+    return 'jpg'
+  }
+
+  if (mimeType === 'image/webp') {
+    return 'webp'
+  }
+
+  return 'png'
+}
+
+function dataUrlToBuffer(dataUrl: string) {
+  const [header, body] = dataUrl.split(',')
+  const mimeType = header.match(/^data:(.*?);base64$/)?.[1] ?? 'image/png'
+
+  return {
+    buffer: Buffer.from(body, 'base64'),
+    mimeType,
+    extension: extensionForMimeType(mimeType),
+  }
+}
+
+async function signedUrlFor(pathName: string) {
+  const admin = requireSupabaseAdmin()
+  const { data, error } = await admin.storage.from(assetBucket).createSignedUrl(pathName, signedUrlTtlSeconds)
+
+  if (error) {
+    throw error
+  }
+
+  return data.signedUrl
+}
+
+async function storedAssetToGameAsset(asset: StoredAsset): Promise<GameAsset> {
+  const frames = await Promise.all(asset.framePaths.map((frame) => signedUrlFor(frame.path)))
+
+  return {
+    ...asset,
+    imageSrc: frames[0] ?? (await signedUrlFor(asset.imagePath)),
+    frames,
+  }
+}
+
+async function uploadText(pathName: string, content: string) {
+  const admin = requireSupabaseAdmin()
+  const { error } = await admin.storage.from(assetBucket).upload(pathName, Buffer.from(content), {
+    contentType: 'application/json',
+    upsert: true,
+  })
+
+  if (error) {
+    throw error
+  }
+}
+
+async function saveAssetForUser(userId: string, asset: GameAsset) {
+  const admin = requireSupabaseAdmin()
+  const framePaths: StoredFrame[] = []
+
+  for (const [index, frame] of asset.frames.entries()) {
+    const { buffer, mimeType, extension } = dataUrlToBuffer(frame)
+    const pathName = `users/${userId}/assets/${asset.id}/frame-${String(index + 1).padStart(2, '0')}.${extension}`
+    const { error } = await admin.storage.from(assetBucket).upload(pathName, buffer, {
+      contentType: mimeType,
+      upsert: true,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    framePaths.push({ path: pathName, mimeType })
+  }
+
+  const storedAsset: StoredAsset = {
+    ...asset,
+    imagePath: framePaths[0]?.path ?? '',
+    framePaths,
+  }
+  const manifestPath = `users/${userId}/library/${asset.id}.json`
+  await uploadText(manifestPath, JSON.stringify(storedAsset))
+
+  return storedAssetToGameAsset(storedAsset)
+}
+
+async function readStoredAsset(userId: string, assetId: string) {
+  const admin = requireSupabaseAdmin()
+  const pathName = `users/${userId}/library/${assetId}.json`
+  const { data, error } = await admin.storage.from(assetBucket).download(pathName)
+
+  if (error) {
+    throw error
+  }
+
+  return JSON.parse(await data.text()) as StoredAsset
+}
+
+async function listStoredAssets(userId: string) {
+  const admin = requireSupabaseAdmin()
+  const { data, error } = await admin.storage.from(assetBucket).list(`users/${userId}/library`, {
+    limit: 200,
+    sortBy: { column: 'created_at', order: 'desc' },
+  })
+
+  if (error) {
+    throw error
+  }
+
+  const manifests = (data ?? []).filter((item) => item.name.endsWith('.json'))
+  const assets = await Promise.all(
+    manifests.map(async (item) => {
+      const assetId = item.name.replace(/\.json$/, '')
+      return storedAssetToGameAsset(await readStoredAsset(userId, assetId))
+    }),
+  )
+
+  return assets.sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt))
 }
 
 async function generateSeedreamFrames(prompt: string, frameCount: number) {
@@ -248,6 +442,56 @@ app.post('/api/generate', async (request, response) => {
 
     response.status(502).json({
       message,
+    })
+  }
+})
+
+app.get('/api/library', async (request, response) => {
+  try {
+    const userId = await readUserIdFromRequest(request)
+    await ensureAssetBucket()
+    response.json({ assets: await listStoredAssets(userId) })
+  } catch (error) {
+    response.status(401).json({
+      message: error instanceof Error ? error.message : 'Cloud asset library unavailable',
+    })
+  }
+})
+
+app.post('/api/library', async (request, response) => {
+  try {
+    const userId = await readUserIdFromRequest(request)
+    await ensureAssetBucket()
+    const body = request.body as { assets?: GameAsset[] }
+    const assets = body.assets ?? []
+
+    if (assets.length === 0) {
+      response.status(400).json({ message: 'No assets to save' })
+      return
+    }
+
+    response.json({ assets: await Promise.all(assets.map((asset) => saveAssetForUser(userId, asset))) })
+  } catch (error) {
+    response.status(500).json({
+      message: error instanceof Error ? error.message : 'Cloud asset save failed',
+    })
+  }
+})
+
+app.patch('/api/library/:assetId/favorite', async (request, response) => {
+  try {
+    const userId = await readUserIdFromRequest(request)
+    await ensureAssetBucket()
+    const body = request.body as { favorite?: boolean }
+    const storedAsset = await readStoredAsset(userId, request.params.assetId)
+    await uploadText(
+      `users/${userId}/library/${request.params.assetId}.json`,
+      JSON.stringify({ ...storedAsset, favorite: Boolean(body.favorite) }),
+    )
+    response.json({ ok: true })
+  } catch (error) {
+    response.status(500).json({
+      message: error instanceof Error ? error.message : 'Cloud favorite update failed',
     })
   }
 })
