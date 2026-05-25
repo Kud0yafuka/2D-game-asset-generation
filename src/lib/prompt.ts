@@ -8,7 +8,13 @@ export function buildStructuredPrompt(params: GenerationParams, lockedAsset?: Ga
   const sizeLabel = params.size.replace('x', ' by ')
   const animationDirection =
     params.frameCount > 1
-      ? `Create ${params.frameCount} consistent animation frames for the same asset. Keep the same camera angle, proportions, outfit, palette, and silhouette across every frame.`
+      ? [
+          `Generate an ordered animation frame set with exactly ${params.frameCount} separate images, one image per frame.`,
+          'Do not make a collage, contact sheet, comparison grid, or sprite sheet inside a single image.',
+          'Each output image should contain one complete frame of the same asset on the same canvas.',
+          'Keep the same camera angle, proportions, outfit, palette, outline weight, and silhouette across every frame.',
+          'Use subtle readable motion progression suitable for a looping 2D game animation.',
+        ].join(' ')
       : 'Create one finished standalone game asset.'
   const lockContext =
     params.styleLock && lockedAsset
@@ -28,6 +34,9 @@ export function buildStructuredPrompt(params: GenerationParams, lockedAsset?: Ga
       ? 'Use a transparent or automatically removable background, isolated object, no text, no watermark.'
       : 'Use a simple neutral background, no text, no watermark.',
     lockContext,
+    params.frameCount > 1
+      ? 'Frame order should read naturally from frame 1 to the final frame; keep transparent padding and object scale consistent so the frames can be assembled into a sprite sheet.'
+      : '',
     'Keep the output centered, game-ready, cleanly separated from the background, and suitable for PNG export.',
   ]
     .filter(Boolean)
