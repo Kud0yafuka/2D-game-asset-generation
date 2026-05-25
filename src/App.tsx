@@ -229,6 +229,7 @@ function App() {
 
       setAssets((current) => [...savedAssets, ...current])
       setSelectedId(savedAssets[0]?.id)
+      setPreviewMode(savedAssets[0]?.frames.length > 1 ? 'sheet' : 'single')
       setActiveCategory(params.categoryId)
       setSyncMessage(`${savedAssets.length} 个新素材已保存到云端。`)
       setTasks((current) =>
@@ -247,6 +248,7 @@ function App() {
       if (generatedAssets.length > 0) {
         setAssets((current) => [...generatedAssets, ...current])
         setSelectedId(generatedAssets[0]?.id)
+        setPreviewMode(generatedAssets[0]?.frames.length > 1 ? 'sheet' : 'single')
         setSyncMessage('生成成功，但云端保存失败。请检查 Supabase Storage 配置。')
       }
 

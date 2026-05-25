@@ -53,6 +53,7 @@ app.get('/api/health', (_request, response) => {
 type ArkImageEvent = {
   type?: string
   b64_json?: string
+  data?: { b64_json?: string } | Array<{ b64_json?: string }>
   usage?: unknown
 }
 
@@ -290,12 +291,13 @@ async function generateSeedreamFrames(prompt: string, frameCount: number) {
     throw new Error('ARK_API_KEY is not configured')
   }
 
+  const imageClient = ark
   const maxImages = Math.min(Math.max(frameCount, 1), 4)
 
-  if (maxImages === 1) {
-    const result = (await ark.images.generate({
+  async function generateSingleFrame(singleFramePrompt: string) {
+    const result = (await imageClient.images.generate({
       model: imageModel,
-      prompt,
+      prompt: singleFramePrompt,
       size: imageSize,
       response_format: 'b64_json',
       watermark,
@@ -309,10 +311,18 @@ async function generateSeedreamFrames(prompt: string, frameCount: number) {
     )
   }
 
+  if (maxImages === 1) {
+    return generateSingleFrame(prompt)
+  }
+
   const frames: string[] = []
-  const stream = (await ark.images.generate({
+  const stream = (await imageClient.images.generate({
     model: imageModel,
-    prompt,
+    prompt: [
+      prompt,
+      `Use Seedream sequential image generation to produce ${maxImages} separate images in this request.`,
+      `Return exactly ${maxImages} partial_succeeded image events if possible, one for each ordered animation frame.`,
+    ].join(' '),
     size: imageSize,
     response_format: 'b64_json',
     stream: true,
@@ -328,8 +338,13 @@ async function generateSeedreamFrames(prompt: string, frameCount: number) {
       continue
     }
 
-    if (event.type === 'image_generation.partial_succeeded' && event.b64_json) {
-      frames.push(imageDataUrlFromBase64(event.b64_json))
+    const eventImages = [
+      event.b64_json,
+      ...(Array.isArray(event.data) ? event.data.map((item) => item.b64_json) : [event.data?.b64_json]),
+    ].filter((image): image is string => Boolean(image))
+
+    if (event.type === 'image_generation.partial_succeeded' || eventImages.length > 0) {
+      frames.push(...eventImages.map(imageDataUrlFromBase64))
     }
 
     if (event.type === 'image_generation.completed') {
@@ -337,7 +352,40 @@ async function generateSeedreamFrames(prompt: string, frameCount: number) {
     }
   }
 
-  return frames
+  if (frames.length >= maxImages) {
+    return frames.slice(0, maxImages)
+  }
+
+  const missingCount = maxImages - frames.length
+  console.warn(
+    JSON.stringify({
+      event: 'image.generate.frame_shortfall',
+      requestedFrames: maxImages,
+      receivedFrames: frames.length,
+      missingCount,
+      fallback: 'single-frame-seedream-calls',
+    }),
+  )
+
+  for (let index = frames.length; index < maxImages; index += 1) {
+    const [supplementalFrame] = await generateSingleFrame(
+      [
+        prompt,
+        `Generate frame ${index + 1} of ${maxImages} for this same animation set.`,
+        'Match the exact same character identity, camera, silhouette, outfit, palette, outline thickness, lighting, canvas size, transparent background, and object scale.',
+        index === 0
+          ? 'Use the neutral starting pose.'
+          : `Show a small readable motion progression from frame ${index} while remaining loop-compatible.`,
+        'Return one isolated frame only, not a sprite sheet, not a collage, no text, no watermark.',
+      ].join(' '),
+    )
+
+    if (supplementalFrame) {
+      frames.push(supplementalFrame)
+    }
+  }
+
+  return frames.slice(0, maxImages)
 }
 
 app.post('/api/generate', async (request, response) => {
