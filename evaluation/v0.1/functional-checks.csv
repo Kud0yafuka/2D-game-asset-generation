@@ -1,0 +1,13 @@
+check_id,check_item,status,evidence_type,evidence,issue_or_follow_up
+FUN-001,未登录时尝试生成,pass,observed,"访客请求 /api/generate 返回 200；生成后未请求 /api/library；页面明确提示游客可预览和导出",更新后的产品口径为访客生成、登录仅用于云端保存
+FUN-002,注册、登录、刷新页面,fail,observed,"Supabase 主机 vgbpedxqvkybesmytzgu.supabase.co 连接关闭；旧账号登录与新账号注册均显示 Failed to fetch",修复或替换 Supabase 项目并增加真实依赖健康检查
+FUN-003,空 Prompt 和过长 Prompt,partial,observed_and_code,"少于 4 字符由前端拦截且不发请求；textarea 无 maxLength，服务端仅检查 trim 后非空",增加长度上限、计数和超限错误
+FUN-004,切换素材类型,pass,observed,"Playwright 验证 character/monster=128×128 4帧、prop/tile=64×64 1帧、ui=128×128 1帧、effect=128×128 6帧",推荐参数随类型正确更新
+FUN-005,生成 1、4、6、8 帧素材,fail,observed_and_code,"1帧与4帧返回数一致；6帧特效实测只返回4帧；服务端硬编码最大4帧",统一 UI 可选范围、服务能力、界面标注与导出元数据
+FUN-006,透明背景开／关,fail,observed,"6 个 transparent=true 成功用例共18帧均无 Alpha 通道或透明像素；transparent=false 地块通过",增加确定性抠图/Alpha 后处理并在返回前校验
+FUN-007,开启沿用选中风格,partial,code_review,"有选中素材时会把 lockedAsset 传入结构化 Prompt；无选中素材时静默退化为普通生成",无选中素材时禁用开关或显示解释
+FUN-008,图片生成超时、限流或服务失败,pass,observed,"额度耗尽时界面原样显示上游 403 欠费信息；保留旧预览且没有用本地样例伪装新结果",将上游 403 从 HTTP 502 映射为可操作的额度错误
+FUN-009,导出 PNG、Sprite Sheet、JSON 和 ZIP,pass,observed,"四类文件均可下载且非空；64×64 PNG、Sheet、metadata JSON 与 ZIP 可解析，schema=spritecraft.asset.v1",透明正确性单列在 FUN-006
+FUN-010,Unity、Godot、Web 三类导出,partial,observed,"Unity ZIP 根目录 Assets/SpriteCraft 正确；Godot ZIP 根目录 spritecraft 与 res://spritecraft 元数据一致；Web ZIP 从 assets/spritecraft 开始但元数据声明 public/assets/spritecraft",Web ZIP 增加 public/ 根目录或修改元数据口径
+FUN-011,云端保存后重新登录,blocked,observed,"Supabase 认证主机不可达，无法建立会话并验证云端恢复",认证修复后重新执行保存—退出—登录—恢复链路
+FUN-012,窄屏和常见桌面视口,pass,observed,"390×844 无水平溢出；滚动后生成按钮位于视口内且可点击；1440×1000 桌面主流程可用",仍需真实移动设备触控与浏览器兼容回归

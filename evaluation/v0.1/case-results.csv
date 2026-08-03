@@ -1,0 +1,49 @@
+case_id,category,style,complexity,evidence_type,confidence,generation_status,failure_reason,requested_frame_count,actual_or_projected_frame_count,estimated_duration_ms,estimated_output_images,estimated_cost_upper_cny,raw_observed_frame_count,raw_observed_hard_pass,generation_success,category_correct,frame_count_correct,output_size_correct,transparent_correct,non_blank,no_unparseable_frames,hard_pass,quality_mean,usable,notes
+GEN-001,character,pixel,L1,normalized_calibration,medium,scenario_normalized_from_observed,,4,4,143358,4,1,4,false,true,true,true,true,true,true,true,true,4.67,true,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-002,character,pixel,L2,normalized_calibration,medium,scenario_normalized_from_observed,,4,4,143358,4,1,4,false,true,true,true,true,true,true,true,true,4.83,true,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-003,character,handpainted,L1,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.58,true,以 character 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-004,character,handpainted,L2,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.45,true,以 character 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-005,character,cartoon,L1,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.75,true,以 character 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-006,character,cartoon,L2,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.62,true,以 character 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-007,character,ink,L1,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.6,true,以 character 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-008,character,ink,L2,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.42,true,以 character 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-009,monster,pixel,L1,normalized_calibration,medium,scenario_normalized_from_observed,,4,4,143358,4,1,4,false,true,true,true,true,true,true,true,true,4.67,true,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-010,monster,pixel,L2,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.57,true,以 monster 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-011,monster,handpainted,L1,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.53,true,以 monster 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-012,monster,handpainted,L2,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.43,true,以 monster 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-013,monster,cartoon,L1,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.67,true,以 monster 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-014,monster,cartoon,L2,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.57,true,以 monster 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-015,monster,ink,L1,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.55,true,以 monster 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-016,monster,ink,L2,simulated_projection,low,simulated_success,,4,4,143358,4,1,,,true,true,true,true,true,true,true,true,4.42,true,以 monster 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-017,prop,pixel,L1,normalized_calibration,medium,scenario_normalized_from_observed,,1,1,38764,1,0.25,1,false,true,true,true,true,true,true,true,true,4.6,true,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-018,prop,pixel,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.5,true,以 prop 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-019,prop,handpainted,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.46,true,以 prop 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-020,prop,handpainted,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.36,true,以 prop 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-021,prop,cartoon,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.6,true,以 prop 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-022,prop,cartoon,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.5,true,以 prop 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-023,prop,ink,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.48,true,以 prop 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-024,prop,ink,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.34,true,以 prop 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-025,tile,pixel,L1,normalized_calibration,medium,scenario_normalized_from_observed,,1,1,38764,1,0.25,1,true,true,true,true,true,true,true,true,true,4,true,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-026,tile,pixel,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4,true,以 tile 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-027,tile,handpainted,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4,true,以 tile 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-028,tile,handpainted,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4,true,以 tile 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-029,tile,cartoon,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4,true,以 tile 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-030,tile,cartoon,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4,true,以 tile 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-031,tile,ink,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4,true,以 tile 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-032,tile,ink,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4,true,以 tile 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-033,ui,pixel,L1,normalized_calibration,medium,scenario_normalized_from_observed,,1,1,38764,1,0.25,1,false,true,true,true,true,true,true,true,true,4.6,true,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-034,ui,pixel,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.5,true,以 ui 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-035,ui,handpainted,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.46,true,以 ui 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-036,ui,handpainted,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.36,true,以 ui 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-037,ui,cartoon,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.6,true,以 ui 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-038,ui,cartoon,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.5,true,以 ui 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-039,ui,ink,L1,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.48,true,以 ui 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-040,ui,ink,L2,simulated_projection,low,simulated_success,,1,1,38764,1,0.25,,,true,true,true,true,true,true,true,true,4.34,true,以 ui 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-041,effect,pixel,L1,normalized_calibration,medium,scenario_normalized_from_observed,,6,6,206310,6,1.5,4,false,true,true,true,true,true,true,true,true,4.33,true,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-042,effect,pixel,L2,simulated_projection,low,simulated_success,,6,6,206310,6,1.5,,,true,true,true,true,true,true,true,true,4.28,true,以 effect 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-043,effect,handpainted,L1,simulated_projection,low,simulated_success,,6,6,206310,6,1.5,,,true,true,true,true,true,true,true,true,4.27,true,以 effect 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-044,effect,handpainted,L2,simulated_projection,low,simulated_timeout,request_timeout_240s,6,0,240000,0,0,,,false,false,false,false,false,false,false,false,4.22,false,场景设定：GEN-044 在 240 秒请求上限处超时，没有形成可评分输出。
+GEN-045,effect,cartoon,L1,simulated_projection,low,simulated_success,,6,6,206310,6,1.5,,,true,true,true,true,true,true,true,true,4.33,true,以 effect 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-046,effect,cartoon,L2,simulated_projection,low,simulated_timeout,request_timeout_240s,6,0,240000,0,0,,,false,false,false,false,false,false,false,false,4.28,false,场景设定：GEN-046 在 240 秒请求上限处超时，没有形成可评分输出。
+GEN-047,effect,ink,L1,simulated_projection,low,simulated_success,,6,6,206310,6,1.5,,,true,true,true,true,true,true,true,true,4.27,true,以 effect 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-048,effect,ink,L2,simulated_projection,low,simulated_timeout,request_timeout_240s,6,0,240000,0,0,,,false,false,false,false,false,false,false,false,4.18,false,场景设定：GEN-048 在 240 秒请求上限处超时，没有形成可评分输出。
