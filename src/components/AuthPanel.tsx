@@ -34,7 +34,7 @@ export function AuthPanel({ email, isConfigured, isBusy, message, onSignIn, onSi
     return (
       <section className="auth-panel" aria-label="Cloud account">
         <strong>云端保存未配置</strong>
-        <span>补充 Supabase 环境变量后可启用登录和素材库同步。</span>
+        <span>游客模式仍可生成、预览和本地导出。</span>
       </section>
     )
   }
@@ -57,7 +57,7 @@ export function AuthPanel({ email, isConfigured, isBusy, message, onSignIn, onSi
   return (
     <section className="auth-panel" aria-label="Cloud account">
       <div>
-        <strong>登录后自动保存</strong>
+        <strong>登录后云端保存</strong>
         <span>{localMessage ?? message}</span>
       </div>
       <div className="auth-fields">
