@@ -1,0 +1,49 @@
+case_id,evidence_type,rater_id,rater_type,confidence,score_applicable,semantic_restoration,style_match,palette_consistency,small_size_readability,multi_frame_consistency,game_pipeline_usability,quality_mean,raw_observed_quality_mean,score_interval_low,score_interval_high,text_or_watermark,obvious_crop,unparseable_or_blank,rationale
+GEN-001,normalized_calibration,simulation-v0.2-user-assumption,simulation,medium,true,5,5,4,5,5,4,4.67,4.5,,,false,false,false,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-002,normalized_calibration,simulation-v0.2-user-assumption,simulation,medium,true,5,5,5,5,5,4,4.83,4.67,,,false,false,false,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-003,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4.4,4.7,4.8,4,4.58,,4.08,5,not_observed,not_observed,not_observed,以 character 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-004,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.6,4.7,4.3,4.5,4.6,4,4.45,,4,4.95,not_observed,not_observed,not_observed,以 character 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-005,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,5,5,4.5,5,5,4,4.75,,4.25,5,not_observed,not_observed,not_observed,以 character 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-006,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4.4,4.8,4.8,4,4.62,,4.12,5,not_observed,not_observed,not_observed,以 character 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-007,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4.4,4.8,4.8,4,4.6,,4.1,5,not_observed,not_observed,not_observed,以 character 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-008,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.5,4.6,4.3,4.6,4.5,4,4.42,,4,4.92,not_observed,not_observed,not_observed,以 character 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-009,normalized_calibration,simulation-v0.2-user-assumption,simulation,medium,true,5,5,5,5,4,4,4.67,4.5,,,false,false,false,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-010,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4.9,4.8,4,4,4.57,,4.07,5,not_observed,not_observed,not_observed,以 monster 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-011,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4.9,4.7,4,4,4.53,,4.03,5,not_observed,not_observed,not_observed,以 monster 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-012,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.6,4.7,4.8,4.5,4,4,4.43,,4,4.93,not_observed,not_observed,not_observed,以 monster 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-013,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,5,5,5,5,4,4,4.67,,4.17,5,not_observed,not_observed,not_observed,以 monster 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-014,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4.9,4.8,4,4,4.57,,4.07,5,not_observed,not_observed,not_observed,以 monster 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-015,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4.9,4.8,4,4,4.55,,4.05,5,not_observed,not_observed,not_observed,以 monster 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-016,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.5,4.6,4.8,4.6,4,4,4.42,,4,4.92,not_observed,not_observed,not_observed,以 monster 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-017,normalized_calibration,simulation-v0.2-user-assumption,simulation,medium,true,5,5,4,5,0,4,4.6,4.4,,,false,false,false,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-018,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4,4.8,0,4,4.5,,4,5,not_observed,not_observed,not_observed,以 prop 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-019,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4,4.7,0,4,4.46,,4,4.96,not_observed,not_observed,not_observed,以 prop 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-020,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.6,4.7,4,4.5,0,4,4.36,,4,4.86,not_observed,not_observed,not_observed,以 prop 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-021,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,5,5,4,5,0,4,4.6,,4.1,5,not_observed,not_observed,not_observed,以 prop 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-022,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4,4.8,0,4,4.5,,4,5,not_observed,not_observed,not_observed,以 prop 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-023,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4,4.8,0,4,4.48,,4,4.98,not_observed,not_observed,not_observed,以 prop 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-024,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.5,4.6,4,4.6,0,4,4.34,,4,4.84,not_observed,not_observed,not_observed,以 prop 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-025,normalized_calibration,simulation-v0.2-user-assumption,simulation,medium,true,4,4,4,4,0,4,4,3.2,,,false,false,false,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-026,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4,4,4,4,0,4,4,,4,4.5,not_observed,not_observed,not_observed,以 tile 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-027,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4,4,4,4,0,4,4,,4,4.5,not_observed,not_observed,not_observed,以 tile 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-028,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4,4,4,4,0,4,4,,4,4.5,not_observed,not_observed,not_observed,以 tile 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-029,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4,4,4,4,0,4,4,,4,4.5,not_observed,not_observed,not_observed,以 tile 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-030,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4,4,4,4,0,4,4,,4,4.5,not_observed,not_observed,not_observed,以 tile 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-031,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4,4,4,4,0,4,4,,4,4.5,not_observed,not_observed,not_observed,以 tile 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-032,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4,4,4,4,0,4,4,,4,4.5,not_observed,not_observed,not_observed,以 tile 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-033,normalized_calibration,simulation-v0.2-user-assumption,simulation,medium,true,5,5,4,5,0,4,4.6,4.4,,,false,false,false,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-034,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4,4.8,0,4,4.5,,4,5,not_observed,not_observed,not_observed,以 ui 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-035,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4,4.7,0,4,4.46,,4,4.96,not_observed,not_observed,not_observed,以 ui 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-036,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.6,4.7,4,4.5,0,4,4.36,,4,4.86,not_observed,not_observed,not_observed,以 ui 类归一化样本为基准推断 handpainted/L2；各软分保守下限为 4。
+GEN-037,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,5,5,4,5,0,4,4.6,,4.1,5,not_observed,not_observed,not_observed,以 ui 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-038,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4,4.8,0,4,4.5,,4,5,not_observed,not_observed,not_observed,以 ui 类归一化样本为基准推断 cartoon/L2；各软分保守下限为 4。
+GEN-039,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4,4.8,0,4,4.48,,4,4.98,not_observed,not_observed,not_observed,以 ui 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-040,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.5,4.6,4,4.6,0,4,4.34,,4,4.84,not_observed,not_observed,not_observed,以 ui 类归一化样本为基准推断 ink/L2；各软分保守下限为 4。
+GEN-041,normalized_calibration,simulation-v0.2-user-assumption,simulation,medium,true,5,5,4,4,4,4,4.33,4,,,false,false,false,用户指定反事实：将真实样本归一化为硬规格全部通过、帧数兑现且可用，保留视觉类别特征。
+GEN-042,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.9,4,4,4,4,4.28,,4,4.78,not_observed,not_observed,not_observed,以 effect 类归一化样本为基准推断 pixel/L2；各软分保守下限为 4。
+GEN-043,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4,4,4,4,4.27,,4,4.77,not_observed,not_observed,not_observed,以 effect 类归一化样本为基准推断 handpainted/L1；各软分保守下限为 4。
+GEN-044,simulated_projection,simulation-v0.2-user-assumption,simulation,low,false,4.6,4.7,4,4,4,4,4.22,,4,4.72,not_observed,not_observed,not_observed,场景设定：GEN-044 在 240 秒请求上限处超时，没有形成可评分输出。
+GEN-045,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,5,5,4,4,4,4,4.33,,4,4.83,not_observed,not_observed,not_observed,以 effect 类归一化样本为基准推断 cartoon/L1；各软分保守下限为 4。
+GEN-046,simulated_projection,simulation-v0.2-user-assumption,simulation,low,false,4.8,4.9,4,4,4,4,4.28,,4,4.78,not_observed,not_observed,not_observed,场景设定：GEN-046 在 240 秒请求上限处超时，没有形成可评分输出。
+GEN-047,simulated_projection,simulation-v0.2-user-assumption,simulation,low,true,4.8,4.8,4,4,4,4,4.27,,4,4.77,not_observed,not_observed,not_observed,以 effect 类归一化样本为基准推断 ink/L1；各软分保守下限为 4。
+GEN-048,simulated_projection,simulation-v0.2-user-assumption,simulation,low,false,4.5,4.6,4,4,4,4,4.18,,4,4.68,not_observed,not_observed,not_observed,场景设定：GEN-048 在 240 秒请求上限处超时，没有形成可评分输出。

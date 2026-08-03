@@ -1,0 +1,4 @@
+task,evidence_type,confidence,estimated_ui_completion_rate,interval_low,interval_high,estimated_spec_completion_rate,rationale
+首次生成并导出透明 PNG,simulated_scenario,low,0.95,0.75,1,1,按用户指定假设，透明与可用性问题已归一化为通过；访客生成和 PNG 导出路径已实测可达。
+生成多帧动画并导出 Sprite Sheet,simulated_scenario,low,0.9,0.65,1,1,按用户指定假设，6 帧与透明规格均兑现；多帧生成和 Sheet 导出路径已实测可达。
+沿用风格并导出引擎 ZIP,simulated_scenario,low,0.8,0.5,0.95,0.67,素材可用性按假设通过；Unity/Godot 路径实测正确，Web ZIP 与风格沿用仍是独立功能风险。

@@ -13,6 +13,16 @@ dist-ssr
 qa
 *.local
 
+# Product evaluation runtime artifacts
+evaluation/v0.1/outputs/
+evaluation/v0.1/runs.jsonl
+evaluation/v0.1/scores.jsonl
+evaluation/v0.1/contact-sheets/
+evaluation/v0.1/pilot-runs.jsonl
+evaluation/v0.1/pilot-outputs/
+.playwright-cli/
+output/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

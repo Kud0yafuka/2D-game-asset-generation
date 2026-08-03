@@ -1,0 +1,8 @@
+case_id,run_id,status,evidence_type,rater_id,rater_type,model,contact_sheet_path,scored_at,error_message
+GEN-001,GEN-001-1785759307875-a1,blocked,observed_image_auto_rater,auto-openai-gpt-5.2,auto_model,gpt-5.2,contact-sheets/GEN-001.png,2026-08-03T13:14:05.422Z,Request timed out.
+GEN-009,GEN-009-1785759472989-a1,blocked,observed_image_auto_rater,auto-openai-gpt-5.2,auto_model,gpt-5.2,contact-sheets/GEN-009.png,2026-08-03T13:14:29.974Z,OPENAI_API_KEY is not configured
+GEN-017,GEN-017-1785759614162-a1,blocked,observed_image_auto_rater,auto-openai-gpt-5.2,auto_model,gpt-5.2,contact-sheets/GEN-017.png,2026-08-03T13:14:29.980Z,OPENAI_API_KEY is not configured
+GEN-025,GEN-025-1785759649992-a1,blocked,observed_image_auto_rater,auto-openai-gpt-5.2,auto_model,gpt-5.2,contact-sheets/GEN-025.png,2026-08-03T13:14:29.983Z,OPENAI_API_KEY is not configured
+GEN-033,GEN-033-1785759697685-a1,blocked,observed_image_auto_rater,auto-openai-gpt-5.2,auto_model,gpt-5.2,contact-sheets/GEN-033.png,2026-08-03T13:14:29.987Z,OPENAI_API_KEY is not configured
+GEN-041,GEN-041-1785759736450-a1,blocked,observed_image_auto_rater,auto-openai-gpt-5.2,auto_model,gpt-5.2,contact-sheets/GEN-041.png,2026-08-03T13:14:30.001Z,OPENAI_API_KEY is not configured
+GEN-002,GEN-002-1785759919610-a1,blocked,observed_image_auto_rater,auto-openai-gpt-5.2,auto_model,gpt-5.2,contact-sheets/GEN-002.png,2026-08-03T13:14:30.014Z,OPENAI_API_KEY is not configured
