@@ -61,7 +61,9 @@ function App() {
   const [authReady, setAuthReady] = useState(false)
   const [authBusy, setAuthBusy] = useState(false)
   const [syncMessage, setSyncMessage] = useState(
-    isSupabaseConfigured ? '登录后素材会自动同步到云端。' : 'Supabase 未配置，无法保存云端素材。',
+    isSupabaseConfigured
+      ? '登录用于云端保存；游客模式可直接生成和导出。'
+      : '云端保存未配置；游客模式仍可生成、预览和导出。',
   )
 
   const user = session?.user
@@ -130,14 +132,14 @@ function App() {
     }
 
     if (!supabase) {
-      setSyncMessage('Supabase 未配置，无法保存云端素材。')
+      setSyncMessage('云端保存未配置；游客模式仍可生成、预览和导出。')
       return
     }
 
     if (!accessToken) {
       setAssets([])
       setSelectedId(undefined)
-      setSyncMessage('登录后素材会自动同步到云端。')
+      setSyncMessage('登录用于云端保存；游客模式可直接生成和导出。')
       return
     }
 
@@ -277,48 +279,55 @@ function App() {
     const taskId = `task-${Date.now()}`
     const category = getCategory(params.categoryId)
     const prompt = params.prompt.trim()
-    const missingAuth = !accessToken || !supabase
     const task: GenerationTask = {
       id: taskId,
       label: `${category.shortLabel} / ${params.frameCount} frames`,
-      status: prompt.length < 4 || missingAuth ? 'failed' : 'running',
+      status: prompt.length < 4 ? 'failed' : 'running',
       startedAt: new Date().toISOString(),
-      completedAt: prompt.length < 4 || missingAuth ? new Date().toISOString() : undefined,
-      message:
-        prompt.length < 4
-          ? '素材描述需要更具体'
-          : missingAuth
-            ? '请先登录，生成后的素材会自动保存到你的云端素材库'
-            : '正在调用 Doubao Seedream 生成真实素材',
+      completedAt: prompt.length < 4 ? new Date().toISOString() : undefined,
+      message: prompt.length < 4 ? '素材描述需要更具体' : '正在调用 Doubao Seedream 生成真实素材',
     }
 
     setTasks((current) => [task, ...current])
-    if (prompt.length < 4 || missingAuth) {
+    if (prompt.length < 4) {
       return
     }
 
     setIsGenerating(true)
-    let generatedAssets: GameAsset[] = []
     try {
       const result = await generateOpenAiAssets(params, selectedAsset)
-      generatedAssets = result.assets
-      setTasks((current) =>
-        current.map((item) =>
-          item.id === taskId
-            ? {
-                ...item,
-                message: '正在保存到云端素材库',
-              }
-            : item,
-        ),
-      )
-      const savedAssets = await saveGeneratedAssets(accessToken, generatedAssets)
+      const generatedAssets = result.assets
+      let finalAssets = generatedAssets
+      let cloudSaved = false
 
-      setAssets((current) => [...savedAssets, ...current])
-      setSelectedId(savedAssets[0]?.id)
-      setPreviewMode(savedAssets[0]?.frames.length > 1 ? 'sheet' : 'single')
+      if (accessToken) {
+        setTasks((current) =>
+          current.map((item) =>
+            item.id === taskId
+              ? {
+                  ...item,
+                  message: '正在保存到云端素材库',
+                }
+              : item,
+          ),
+        )
+
+        try {
+          finalAssets = await saveGeneratedAssets(accessToken, generatedAssets)
+          cloudSaved = true
+          setSyncMessage(`${finalAssets.length} 个新素材已保存到云端。`)
+        } catch (error) {
+          const detail = error instanceof Error ? error.message : '未知错误'
+          setSyncMessage(`生成成功，但云端保存失败：${detail}`)
+        }
+      } else {
+        setSyncMessage('游客模式：素材仅保留在当前页面，可直接预览和导出。')
+      }
+
+      setAssets((current) => [...finalAssets, ...current])
+      setSelectedId(finalAssets[0]?.id)
+      setPreviewMode(finalAssets[0]?.frames.length > 1 ? 'sheet' : 'single')
       setActiveCategory(params.categoryId)
-      setSyncMessage(`${savedAssets.length} 个新素材已保存到云端。`)
       setTasks((current) =>
         current.map((item) =>
           item.id === taskId
@@ -326,19 +335,16 @@ function App() {
                 ...item,
                 status: 'done',
                 completedAt: new Date().toISOString(),
-                message: `${savedAssets.length} 个 Doubao Seedream 素材已生成并保存`,
+                message: cloudSaved
+                  ? `${finalAssets.length} 个 Doubao Seedream 素材已生成并保存`
+                  : accessToken
+                    ? `${finalAssets.length} 个 Doubao Seedream 素材已生成，云端保存失败`
+                    : `${finalAssets.length} 个 Doubao Seedream 素材已生成（游客模式）`,
               }
             : item,
         ),
       )
     } catch (error) {
-      if (generatedAssets.length > 0) {
-        setAssets((current) => [...generatedAssets, ...current])
-        setSelectedId(generatedAssets[0]?.id)
-        setPreviewMode(generatedAssets[0]?.frames.length > 1 ? 'sheet' : 'single')
-        setSyncMessage('生成成功，但云端保存失败。请检查 Supabase Storage 配置。')
-      }
-
       setTasks((current) =>
         current.map((item) =>
           item.id === taskId
@@ -465,8 +471,6 @@ function App() {
           <ControlsPanel
             params={params}
             isGenerating={isGenerating}
-            canGenerate={Boolean(user && supabase)}
-            disabledMessage="请先登录。登录后生成的素材会自动保存，下次打开仍可恢复。"
             onParamsChange={updateParams}
             onGenerate={() => void runGeneration()}
           />

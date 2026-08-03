@@ -11,8 +11,6 @@ import type { AssetSize, GenerationParams } from '../types'
 interface ControlsPanelProps {
   params: GenerationParams
   isGenerating: boolean
-  canGenerate: boolean
-  disabledMessage: string
   onParamsChange: (params: GenerationParams) => void
   onGenerate: () => void
 }
@@ -20,8 +18,6 @@ interface ControlsPanelProps {
 export function ControlsPanel({
   params,
   isGenerating,
-  canGenerate,
-  disabledMessage,
   onParamsChange,
   onGenerate,
 }: ControlsPanelProps) {
@@ -183,13 +179,12 @@ export function ControlsPanel({
         type="button"
         className="primary-action"
         onClick={onGenerate}
-        disabled={isGenerating || !canGenerate}
+        disabled={isGenerating}
         title="调用 Doubao Seedream 生成真实 2D 游戏素材"
       >
         <WandSparkles size={17} />
         {isGenerating ? '生成中...' : '生成素材'}
       </button>
-      {!canGenerate && <p className="panel-hint">{disabledMessage}</p>}
     </section>
   )
 }
